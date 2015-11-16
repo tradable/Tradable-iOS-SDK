@@ -1,0 +1,10 @@
+framework module TradableAPI {
+  umbrella header "TradableAPI.h"
+
+  export *
+  module * { export * }
+}
+
+module TradableAPI.Swift {
+    header "TradableAPI-Swift.h"
+}
