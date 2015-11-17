@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<data>
-		ZGxfM6+5EuBlqH85Idi2m5a51FQ=
+		HgF2XLWKetbHoavt9UDYlgp5lIg=
 		</data>
 		<key>Headers/TradableAPI.h</key>
 		<data>
@@ -18,19 +18,19 @@
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftdoc</key>
 		<data>
-		JZzYc63gXZiKAbQaNQOqwE1RrME=
+		b4xNW0wQveHXNIc6OOcUYMUytt4=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<data>
-		PVyYaEto6tUkq1w09pKNwogZuDI=
+		AFIxPvgmCR+xmOAC/xL1Hgr3GMQ=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		HIQLg8W/22SQHFKBFQmF/H7qG+E=
+		lk5F0YR2vg6qQ2QMt7a9vM90QD8=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		neMkdBgO3lZcdJlmNER64SLMMYM=
+		+X/N9n5/mVARC98eYhvUPGlSUig=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -41,7 +41,7 @@
 	<dict>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<data>
-		ZGxfM6+5EuBlqH85Idi2m5a51FQ=
+		HgF2XLWKetbHoavt9UDYlgp5lIg=
 		</data>
 		<key>Headers/TradableAPI.h</key>
 		<data>
@@ -49,19 +49,19 @@
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftdoc</key>
 		<data>
-		JZzYc63gXZiKAbQaNQOqwE1RrME=
+		b4xNW0wQveHXNIc6OOcUYMUytt4=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<data>
-		PVyYaEto6tUkq1w09pKNwogZuDI=
+		AFIxPvgmCR+xmOAC/xL1Hgr3GMQ=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		HIQLg8W/22SQHFKBFQmF/H7qG+E=
+		lk5F0YR2vg6qQ2QMt7a9vM90QD8=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		neMkdBgO3lZcdJlmNER64SLMMYM=
+		+X/N9n5/mVARC98eYhvUPGlSUig=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>

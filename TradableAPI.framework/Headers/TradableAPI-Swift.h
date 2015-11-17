@@ -96,6 +96,7 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @interface NSNumber (SWIFT_EXTENSION(TradableAPI))
 @end
 
+@class NSURL;
 @class TradableAccount;
 enum TradableUpdateType : NSInteger;
 enum TradableUpdateFrequency : NSInteger;
@@ -133,6 +134,18 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// A singleton object used to invoke API methods on.
 + (Tradable * __nonnull)sharedInstance;
+
+/// Begins authentication flow for Tradable; opens a system browser in order to authorize. It should be the first call made to TradableAPI.
+///
+/// \param appId OAuth flow client ID.
+///
+/// \param uri OAuth flow redirect URL.
++ (void)authenticateWithAppIdAndUri:(uint64_t)appId uri:(NSString * __nonnull)uri;
+
+/// Tells the API to activate with URL containing access token. Should be called when system browser opens the application using TradableAPI. When the access token is successfully created, tradableReady delegate method is called.
+///
+/// \param url URL containing information needed in order to create access token.
+- (void)activateAfterLaunchWithURL:(NSURL * __nonnull)url;
 
 /// Starts updates for specified account after stopping previous updates.
 ///
