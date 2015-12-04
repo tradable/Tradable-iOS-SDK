@@ -4,9 +4,13 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Assets.car</key>
+		<data>
+		oShv+ky9Hkq131malw88Wv5gumE=
+		</data>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<data>
-		HgF2XLWKetbHoavt9UDYlgp5lIg=
+		OPhLnDnThsTSyZ6EY8ExtiSzLuc=
 		</data>
 		<key>Headers/TradableAPI.h</key>
 		<data>
@@ -14,34 +18,78 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		SjXdLAX+cRJXaJmgtpVbntNHAo4=
+		OW4z577Z40DX12GmuRqB16mCo+4=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftdoc</key>
 		<data>
-		b4xNW0wQveHXNIc6OOcUYMUytt4=
+		+8uy/UlRSVWkG+m3g9WuSY5cXN8=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<data>
-		AFIxPvgmCR+xmOAC/xL1Hgr3GMQ=
+		9ybSt2nu9olWQTD8RaF4FvbMMrA=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		lk5F0YR2vg6qQ2QMt7a9vM90QD8=
+		8bu6cnSWEr3znP9DhpSKMqSmNys=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		+X/N9n5/mVARC98eYhvUPGlSUig=
+		DpIUgTU6dEjTV71gRNN21edWGw8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		eGPwsRj6RLeqGjaaw8dVVAJv7KI=
 		</data>
+		<key>Roboto-Regular.ttf</key>
+		<data>
+		HR1B/K3Fcd7LZEQhG3mTuZzpJuI=
+		</data>
+		<key>Widgets.storyboardc/AOs-Lz-tDt-view-kF4-RF-Hq1.nib</key>
+		<data>
+		Z7GVuYrjVTDXSuarqMhmPKeJCiA=
+		</data>
+		<key>Widgets.storyboardc/Info.plist</key>
+		<data>
+		SepT2tPIMCLIMY63zZLYYbE1wEI=
+		</data>
+		<key>Widgets.storyboardc/Ofe-Mb-3Wk-view-WHb-jN-al6.nib</key>
+		<data>
+		JgDfOq/Y1j9ozl5q5RGxxSomg/M=
+		</data>
+		<key>Widgets.storyboardc/P3i-77-Cyi-view-rqr-I2-tNf.nib</key>
+		<data>
+		9MNwmu8ysfQgMQLT7L3nJ2bnLa8=
+		</data>
+		<key>Widgets.storyboardc/editOrder.nib</key>
+		<data>
+		W/3BMNgWVKKfYt4oQy0fFaQlaNM=
+		</data>
+		<key>Widgets.storyboardc/instrumentSelector.nib</key>
+		<data>
+		yzwVOSfegz8FJNPaRjVUV+q4X1k=
+		</data>
+		<key>Widgets.storyboardc/orderEntry.nib</key>
+		<data>
+		5m+Yr7t4hvXozWPSVOQ54sSN8oE=
+		</data>
+		<key>Widgets.storyboardc/positionDetail.nib</key>
+		<data>
+		nLyqmxXmHbPTCqB9M1KL0QQm8QQ=
+		</data>
+		<key>Widgets.storyboardc/ui3-jR-1Wt-view-GcZ-RC-kXm.nib</key>
+		<data>
+		dYqfsJZVlga7d6D0CAdmi49xGYQ=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Assets.car</key>
+		<data>
+		oShv+ky9Hkq131malw88Wv5gumE=
+		</data>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<data>
-		HgF2XLWKetbHoavt9UDYlgp5lIg=
+		OPhLnDnThsTSyZ6EY8ExtiSzLuc=
 		</data>
 		<key>Headers/TradableAPI.h</key>
 		<data>
@@ -49,23 +97,63 @@
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftdoc</key>
 		<data>
-		b4xNW0wQveHXNIc6OOcUYMUytt4=
+		+8uy/UlRSVWkG+m3g9WuSY5cXN8=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<data>
-		AFIxPvgmCR+xmOAC/xL1Hgr3GMQ=
+		9ybSt2nu9olWQTD8RaF4FvbMMrA=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		lk5F0YR2vg6qQ2QMt7a9vM90QD8=
+		8bu6cnSWEr3znP9DhpSKMqSmNys=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		+X/N9n5/mVARC98eYhvUPGlSUig=
+		DpIUgTU6dEjTV71gRNN21edWGw8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		eGPwsRj6RLeqGjaaw8dVVAJv7KI=
+		</data>
+		<key>Roboto-Regular.ttf</key>
+		<data>
+		HR1B/K3Fcd7LZEQhG3mTuZzpJuI=
+		</data>
+		<key>Widgets.storyboardc/AOs-Lz-tDt-view-kF4-RF-Hq1.nib</key>
+		<data>
+		Z7GVuYrjVTDXSuarqMhmPKeJCiA=
+		</data>
+		<key>Widgets.storyboardc/Info.plist</key>
+		<data>
+		SepT2tPIMCLIMY63zZLYYbE1wEI=
+		</data>
+		<key>Widgets.storyboardc/Ofe-Mb-3Wk-view-WHb-jN-al6.nib</key>
+		<data>
+		JgDfOq/Y1j9ozl5q5RGxxSomg/M=
+		</data>
+		<key>Widgets.storyboardc/P3i-77-Cyi-view-rqr-I2-tNf.nib</key>
+		<data>
+		9MNwmu8ysfQgMQLT7L3nJ2bnLa8=
+		</data>
+		<key>Widgets.storyboardc/editOrder.nib</key>
+		<data>
+		W/3BMNgWVKKfYt4oQy0fFaQlaNM=
+		</data>
+		<key>Widgets.storyboardc/instrumentSelector.nib</key>
+		<data>
+		yzwVOSfegz8FJNPaRjVUV+q4X1k=
+		</data>
+		<key>Widgets.storyboardc/orderEntry.nib</key>
+		<data>
+		5m+Yr7t4hvXozWPSVOQ54sSN8oE=
+		</data>
+		<key>Widgets.storyboardc/positionDetail.nib</key>
+		<data>
+		nLyqmxXmHbPTCqB9M1KL0QQm8QQ=
+		</data>
+		<key>Widgets.storyboardc/ui3-jR-1Wt-view-GcZ-RC-kXm.nib</key>
+		<data>
+		dYqfsJZVlga7d6D0CAdmi49xGYQ=
 		</data>
 	</dict>
 	<key>rules</key>
