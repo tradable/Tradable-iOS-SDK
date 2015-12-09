@@ -121,6 +121,12 @@ enum TradableSingleProtection : NSInteger;
 @class TradableInstrument;
 @class TradablePositions;
 @class TradableOrders;
+enum TradableOrderSide : NSInteger;
+@protocol TradableOrderEntryDelegate;
+@class UIViewController;
+@protocol TradableInstrumentSelectorDelegate;
+@protocol TradableEditOrderDelegate;
+@protocol TradablePositionDetailDelegate;
 @protocol TradableAPIDelegate;
 
 
@@ -375,6 +381,58 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param completion The closure to be called when the response comes back, with optional array of TradableOrder objects and optional TradableError object.
 - (void)getPendingOrders:(TradableAccount * __nonnull)forAccount completion:(void (^ __null_unspecified)(NSArray<TradableOrder *> * __nullable, TradableError * __nullable))completion;
+
+/// Presents Order Entry widget.
+///
+/// \param forAccount The account for which the widget should be presented.
+///
+/// \param symbol An optional, preselected symbol in the widget. If nil, no symbol will be preselected.
+///
+/// \param side Preselected order side in the widget.
+///
+/// \param delegate An optional TradableOrderEntryDelegate that will be called when the widget is dismissed.
+///
+/// \param presentingViewController A view controller that will present the widget.
+///
+/// \param presentationStyle A style used when presenting the widget.
+- (void)presentOrderEntry:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nullable)symbol side:(enum TradableOrderSide)side delegate:(id <TradableOrderEntryDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
+
+/// Presents Instrument Selector widget.
+///
+/// \param forAccount The account for which the widget should be presented.
+///
+/// \param delegate An optional TradableInstrumentSelectorDelegate that will handle the widget dismissal with selected instrument.
+///
+/// \param presentingViewController A view controller that will present the widget.
+///
+/// \param presentationStyle A style used when presenting the widget.
+- (void)presentInstrumentSelector:(TradableAccount * __nonnull)forAccount delegate:(id <TradableInstrumentSelectorDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
+
+/// Presents Edit Order widget.
+///
+/// \param forAccount The account for which the widget should be presented.
+///
+/// \param order The order whose details will be displayed and which is to be edited.
+///
+/// \param delegate An optional TradableEditOrderDelegate that will be called when the widget is dismissed.
+///
+/// \param presentingViewController A view controller that will present the widget.
+///
+/// \param presentationStyle A style used when presenting the widget.
+- (void)presentEditOrder:(TradableAccount * __nonnull)forAccount order:(TradableOrder * __nonnull)order delegate:(id <TradableEditOrderDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
+
+/// Presents Position Detail widget.
+///
+/// \param forAccount The account for which the widget should be presented.
+///
+/// \param position The position whose details will be displayed.
+///
+/// \param delegate An optional TradablePositionDetailDelegate that will be called when the widget is dismissed.
+///
+/// \param presentingViewController A view controller that will present the widget.
+///
+/// \param presentationStyle A style used when presenting the widget.
+- (void)presentPositionDetail:(TradableAccount * __nonnull)forAccount position:(TradablePosition * __nonnull)position delegate:(id <TradablePositionDetailDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
 @end
 
 @class TradableAccountMetrics;
@@ -852,7 +910,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOSUser")
 - (void)getUserPicture:(void (^ __null_unspecified)(UIImage * __nonnull))picCompleted;
 @end
 
-enum TradableOrderSide : NSInteger;
 enum TradableOrderType : NSInteger;
 enum TradableOrderStatus : NSInteger;
 

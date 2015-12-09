@@ -1,0 +1,8 @@
+v1.1:
+
+- Added four UI widgets to the SDK: Order Entry, Position Detail, Edit Order and Instrument Selector.
+
+
+v1.0:
+
+- Initial SDK version.
