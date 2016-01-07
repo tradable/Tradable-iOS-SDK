@@ -157,6 +157,15 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param url URL containing information needed in order to create access token.
 - (void)activateAfterLaunchWithURL:(NSURL * __nonnull)url;
 
+/// Tells the API to activate with an access token. When the activation is successful, tradableReady delegate method is called.
+///
+/// \param accessToken The access token to activate the API with.
+///
+/// \param endpointURL The URL of an endpoint the token has been obtained from.
+///
+/// \param expiresIn The expiration time in seconds from now.
+- (void)activateAfterLaunchWithAccessToken:(NSString * __nonnull)accessToken endpointURL:(NSString * __nonnull)endpointURL expiresIn:(uint64_t)expiresIn;
+
 /// Starts updates for specified account after stopping previous updates.
 ///
 /// \param forAccount The account for which the updates should be started.
@@ -502,7 +511,7 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithToken:(NSString * __nonnull)token endpointURL:(NSString * __nonnull)endpointURL expiresIn:(NSInteger)expiresIn OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithToken:(NSString * __nonnull)token endpointURL:(NSString * __nonnull)endpointURL expiresIn:(uint64_t)expiresIn OBJC_DESIGNATED_INITIALIZER;
 @end
 
 @class UIImage;
