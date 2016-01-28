@@ -97,6 +97,7 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @interface NSNumber (SWIFT_EXTENSION(TradableAPI))
 @end
 
+@class TradableAccessToken;
 @class UIWebView;
 @class NSURL;
 @class TradableAccount;
@@ -138,10 +139,13 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 @property (nonatomic, weak) id <TradableAPIDelegate> __nullable delegate;
 
 /// The current user of Tradable OS. May have multiple trading accounts with one or more brokers.
-@property (nonatomic, weak) TradableOSUser * __nullable currentOsUser;
+@property (nonatomic, weak) TradableOSUser * __nullable currentEmbedUser;
 
 /// A singleton object used to invoke API methods on.
 + (Tradable * __nonnull)sharedInstance;
+
+/// Returns the current access token.
+- (TradableAccessToken * __nullable)getCurrentAccessToken;
 
 /// Begins authentication flow for Tradable; if webView is not specified, it opens a system browser in order to authorize. It should be the first call made to TradableAPI.
 ///
@@ -160,11 +164,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// Tells the API to activate with an access token. When the activation is successful, tradableReady delegate method is called.
 ///
 /// \param accessToken The access token to activate the API with.
-///
-/// \param endpointURL The URL of an endpoint the token has been obtained from.
-///
-/// \param expiresIn The expiration time in seconds from now.
-- (void)activateAfterLaunchWithAccessToken:(NSString * __nonnull)accessToken endpointURL:(NSString * __nonnull)endpointURL expiresIn:(uint64_t)expiresIn;
+- (void)activateAfterLaunchWithAccessToken:(TradableAccessToken * __nonnull)accessToken;
 
 /// Starts updates for specified account after stopping previous updates.
 ///
@@ -514,6 +514,7 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 - (nonnull instancetype)initWithToken:(NSString * __nonnull)token endpointURL:(NSString * __nonnull)endpointURL expiresIn:(uint64_t)expiresIn OBJC_DESIGNATED_INITIALIZER;
 @end
 
+enum TradableTrackConfiguration : NSInteger;
 @class UIImage;
 @class TradableBrokerLogos;
 
@@ -530,6 +531,9 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 
 /// The name of the broker that the account belongs to.
 @property (nonatomic, readonly, copy) NSString * __nonnull brokerName;
+
+/// The id of the broker that the account belongs to.
+@property (nonatomic, readonly) NSInteger brokerId;
 
 /// The id of the broker account.
 @property (nonatomic, readonly, copy) NSString * __nonnull brokerageAccountId;
@@ -549,6 +553,9 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// Indicates whether it is live account or not.
 @property (nonatomic, readonly) BOOL isLiveAccount;
 
+/// Specifies the account's track configuration.
+@property (nonatomic, readonly) enum TradableTrackConfiguration trackConfiguration;
+
 /// A small broker logo for the account. Might not be available.
 @property (nonatomic, strong) UIImage * __nullable smallBrokerLogo;
 
@@ -565,7 +572,7 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithId:(NSString * __nonnull)id displayName:(NSString * __nonnull)displayName brokerName:(NSString * __nonnull)brokerName brokerageAccountId:(NSString * __nonnull)brokerageAccountId endpointUrl:(NSString * __nonnull)endpointUrl currencyIsoCode:(NSString * __nonnull)currencyIsoCode currencySign:(NSString * __nonnull)currencySign externalBackofficeReport:(NSString * __nonnull)externalBackofficeReport brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos isLiveAccount:(BOOL)isLiveAccount OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithId:(NSString * __nonnull)id displayName:(NSString * __nonnull)displayName brokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId brokerageAccountId:(NSString * __nonnull)brokerageAccountId endpointUrl:(NSString * __nonnull)endpointUrl currencyIsoCode:(NSString * __nonnull)currencyIsoCode currencySign:(NSString * __nonnull)currencySign externalBackofficeReport:(NSString * __nonnull)externalBackofficeReport brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos isLiveAccount:(BOOL)isLiveAccount trackConfiguration:(enum TradableTrackConfiguration)trackConfiguration OBJC_DESIGNATED_INITIALIZER;
 
 /// Fetches small broker logo and caches it.
 ///
@@ -856,11 +863,14 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 /// True if order amounts must be multiples of the minimum amount.
 @property (nonatomic, readonly) BOOL multipleOfMinAmount;
 
+/// The quote currency of the instrument
+@property (nonatomic, readonly, copy) NSString * __nonnull quoteCurrency;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol brokerageAccountSymbol:(NSString * __nonnull)brokerageAccountSymbol displayName:(NSString * __nonnull)displayName shortDescription:(NSString * __nonnull)shortDescription type:(enum TradableInstrumentType)type pipPrecision:(NSInteger)pipPrecision minAmount:(double)minAmount maxAmount:(double)maxAmount multipleOfMin:(BOOL)multipleOfMin OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol brokerageAccountSymbol:(NSString * __nonnull)brokerageAccountSymbol displayName:(NSString * __nonnull)displayName shortDescription:(NSString * __nonnull)shortDescription type:(enum TradableInstrumentType)type pipPrecision:(NSInteger)pipPrecision minAmount:(double)minAmount maxAmount:(double)maxAmount multipleOfMin:(BOOL)multipleOfMin quoteCurrency:(NSString * __nonnull)quoteCurrency OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -882,6 +892,12 @@ typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
 
 /// Contract for difference instrument type.
   TradableInstrumentTypeCFD = 1,
+
+/// Equity instrument type.
+  TradableInstrumentTypeEQUITY = 2,
+
+/// Exchange-traded fund instrument type.
+  TradableInstrumentTypeEFT = 3,
 };
 
 
@@ -1149,6 +1165,9 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 /// Symbol for which this object holds prices.
 @property (nonatomic, readonly, copy) NSString * __nonnull symbol;
 
+/// The current value of one pip for one unit of this symbol converted to the account currency.
+@property (nonatomic, readonly) double pipValue;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 @end
@@ -1196,6 +1215,20 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableSymbols")
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
+
+
+/// Possible track configurations.
+typedef SWIFT_ENUM(NSInteger, TradableTrackConfiguration) {
+
+/// Positions for the same instrument are on the same track.
+  TradableTrackConfigurationSINGLE = 0,
+
+/// Positions for the same instrument can be on different tracks.
+  TradableTrackConfigurationMULTI = 1,
+
+/// Positions for the same instrument can be on different tracks, but hedging is not allowed.
+  TradableTrackConfigurationMULTI_NO_HEDGE = 2,
+};
 
 
 /// Update frequency for managed mode.
