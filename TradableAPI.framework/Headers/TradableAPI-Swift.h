@@ -138,16 +138,28 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// TradableAPI delegate for hooking into update responses.
 @property (nonatomic, weak) id <TradableAPIDelegate> __nullable delegate;
 
-/// The current user of Tradable OS. May have multiple trading accounts with one or more brokers.
-@property (nonatomic, weak) TradableOSUser * __nullable currentEmbedUser;
-
 /// A singleton object used to invoke API methods on.
 + (Tradable * __nonnull)sharedInstance;
 
-/// Returns the current access token.
+/// Returns the current access token (may be nil).
 - (TradableAccessToken * __nullable)getCurrentAccessToken;
 
-/// Begins authentication flow for Tradable; if webView is not specified, it opens a system browser in order to authorize. It should be the first call made to TradableAPI.
+/// Returns the last session's access token, if exists and is not expired; nil otherwise.
+- (TradableAccessToken * __nullable)getLastSessionAccessToken;
+
+/// Removes the current access token from the keychain and nulls it in the SDK.
+- (void)disposeCurrentAccessToken;
+
+/// Tries to activate Tradable SDK with the last known token, if fails, falls back to authentication flow. If the current token exists and is not expired, it uses the current token for the session. Otherwise tries to restore previous session's token and use it for the current session. If that token is expired or doesn't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
+///
+/// \param appId OAuth flow client ID.
+///
+/// \param uri OAuth flow redirect URL.
+///
+/// \param webView Optional UIWebView component used to open login website. If not specified, system browser will be opened.
++ (void)activateOrAuthenticate:(uint64_t)appId uri:(NSString * __nonnull)uri webView:(UIWebView * __nullable)webView;
+
+/// Begins authentication flow for Tradable; if webView is not specified, it opens a system browser in order to authorize. Doesn't restore previous session's token. Consider using activateOrAuthenticate(appId: UInt64, uri: String, webView: UIWebView?) instead.
 ///
 /// \param appId OAuth flow client ID.
 ///
@@ -492,11 +504,12 @@ SWIFT_PROTOCOL("_TtP11TradableAPI19TradableAPIDelegate_")
 @end
 
 @class NSDate;
+@class NSCoder;
 
 
 /// Access token wrapper.
 SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
-@interface TradableAccessToken : NSObject
+@interface TradableAccessToken : NSObject <NSCoding>
 
 /// The token itself.
 @property (nonatomic, readonly, copy) NSString * __nonnull token;
@@ -512,11 +525,19 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithToken:(NSString * __nonnull)token endpointURL:(NSString * __nonnull)endpointURL expiresIn:(uint64_t)expiresIn OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithToken:(NSString * __nonnull)token endpointURL:(NSString * __nonnull)endpointURL expirationDate:(NSDate * __nonnull)expirationDate OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * __nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * __nonnull)coder;
 @end
 
-enum TradableTrackConfiguration : NSInteger;
-@class UIImage;
 @class TradableBrokerLogos;
+enum TradableTrackConfiguration : NSInteger;
 
 
 /// An account used for trading.
@@ -538,6 +559,9 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// The id of the broker account.
 @property (nonatomic, readonly, copy) NSString * __nonnull brokerageAccountId;
 
+/// Collection of logos for the broker.
+@property (nonatomic, readonly, strong) TradableBrokerLogos * __nonnull brokerLogos;
+
 /// The router endpoint URL for this account. Tradable integrates with brokers in different regions of the world, to minimize the latency you must connect to a Tradable endpoint in the same region as the broker's trading backend is located.
 @property (nonatomic, readonly, copy) NSString * __nonnull endpointUrl;
 
@@ -547,8 +571,8 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// The symbolic sign for the currency.
 @property (nonatomic, readonly, copy) NSString * __nonnull currencySign;
 
-/// URL to the broker's backend reporting system.
-@property (nonatomic, readonly, copy) NSString * __nonnull externalBackofficeReport;
+/// An optional URL to the broker's backend reporting system.
+@property (nonatomic, readonly, copy) NSString * __nullable externalBackofficeReport;
 
 /// Indicates whether it is live account or not.
 @property (nonatomic, readonly) BOOL isLiveAccount;
@@ -556,43 +580,17 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// Specifies the account's track configuration.
 @property (nonatomic, readonly) enum TradableTrackConfiguration trackConfiguration;
 
-/// A small broker logo for the account. Might not be available.
-@property (nonatomic, strong) UIImage * __nullable smallBrokerLogo;
+/// Specifies if positions on this account support stop loss protections.
+@property (nonatomic, readonly) BOOL stopLossSupported;
 
-/// A broker logo on a light background for the account. Might not be available.
-@property (nonatomic, strong) UIImage * __nullable lightBrokerLogo;
-
-/// A broker logo on a dark background for the account. Might not be available.
-@property (nonatomic, strong) UIImage * __nullable darkBrokerLogo;
-
-/// A broker logo in SVG format for the account. Might not be available.
-@property (nonatomic, strong) UIImage * __nullable svgBrokerLogo;
+/// Specifies if positions on this account support take profit protections.
+@property (nonatomic, readonly) BOOL takeProfitSupported;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithId:(NSString * __nonnull)id displayName:(NSString * __nonnull)displayName brokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId brokerageAccountId:(NSString * __nonnull)brokerageAccountId endpointUrl:(NSString * __nonnull)endpointUrl currencyIsoCode:(NSString * __nonnull)currencyIsoCode currencySign:(NSString * __nonnull)currencySign externalBackofficeReport:(NSString * __nonnull)externalBackofficeReport brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos isLiveAccount:(BOOL)isLiveAccount trackConfiguration:(enum TradableTrackConfiguration)trackConfiguration OBJC_DESIGNATED_INITIALIZER;
-
-/// Fetches small broker logo and caches it.
-///
-/// \param logoCompleted A closure containing an optional small broker logo for this account.
-- (void)getSmallBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
-
-/// Fetches a broker logo on light background and caches it.
-///
-/// \param logoCompleted A closure containing an optional broker logo on light background for this account.
-- (void)getLightBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
-
-/// Fetches a broker logo on dark background and caches it.
-///
-/// \param logoCompleted A closure containing an optional broker logo on dark background for this account.
-- (void)getDarkBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
-
-/// Fetches broker logo in SVG format and caches it.
-///
-/// \param logoCompleted A closure containing an optional broker logo in SVG format for this account.
-- (void)getSvgBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+- (nonnull instancetype)initWithId:(NSString * __nonnull)id displayName:(NSString * __nonnull)displayName brokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId brokerageAccountId:(NSString * __nonnull)brokerageAccountId brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos endpointUrl:(NSString * __nonnull)endpointUrl currencyIsoCode:(NSString * __nonnull)currencyIsoCode currencySign:(NSString * __nonnull)currencySign externalBackofficeReport:(NSString * __nullable)externalBackofficeReport isLiveAccount:(BOOL)isLiveAccount trackConfiguration:(enum TradableTrackConfiguration)trackConfiguration stopLossSupported:(BOOL)stopLossSupported takeProfitSupported:(BOOL)takeProfitSupported OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -691,6 +689,32 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableAmount")
 
 
 
+/// Provides information about a broker available in the system.
+SWIFT_CLASS("_TtC11TradableAPI14TradableBroker")
+@interface TradableBroker : NSObject
+
+/// The name of the broker that the account belongs to.
+@property (nonatomic, readonly, copy) NSString * __nonnull brokerName;
+
+/// The id of the broker that the account belongs to.
+@property (nonatomic, readonly) NSInteger brokerId;
+
+/// Indicates whether the broker serves live accounts or not.
+@property (nonatomic, readonly) BOOL isLive;
+
+/// Collection of logos for the broker.
+@property (nonatomic, readonly, strong) TradableBrokerLogos * __nonnull brokerLogos;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithBrokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId isLive:(BOOL)isLive brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class UIImage;
+
+
 /// Contains a set of various broker logos for specific account.
 SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
 @interface TradableBrokerLogos : NSObject
@@ -699,7 +723,32 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithSmall:(NSString * __nonnull)small onLight:(NSString * __nonnull)onLight onDark:(NSString * __nonnull)onDark svg:(NSString * __nonnull)svg OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithSmall:(NSString * __nonnull)small onLight:(NSString * __nonnull)onLight onDark:(NSString * __nonnull)onDark svg:(NSString * __nonnull)svg svgSolid:(NSString * __nonnull)svgSolid OBJC_DESIGNATED_INITIALIZER;
+
+/// Fetches small broker logo and caches it.
+///
+/// \param logoCompleted A closure containing an optional small broker logo for this account.
+- (void)getSmallBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+
+/// Fetches a broker logo on light background and caches it.
+///
+/// \param logoCompleted A closure containing an optional broker logo on light background for this account.
+- (void)getLightBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+
+/// Fetches a broker logo on dark background and caches it.
+///
+/// \param logoCompleted A closure containing an optional broker logo on dark background for this account.
+- (void)getDarkBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+
+/// Fetches broker logo in SVG format and caches it.
+///
+/// \param logoCompleted A closure containing an optional broker logo in SVG format for this account.
+- (void)getSvgBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+
+/// Fetches broker solid logo in SVG format and caches it.
+///
+/// \param logoCompleted A closure containing an optional broker solid logo in SVG format for this account.
+- (void)getSvgSolidBrokerLogo:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
 @end
 
 
@@ -760,12 +809,15 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 
 
 
-/// Contains a list of candles.
+/// Contains a list of candles and a list of indicators.
 SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 @interface TradableCandles : NSObject
 
 /// A list of candles.
 @property (nonatomic, copy) NSArray<TradableCandle *> * __nonnull candles;
+
+/// A list of indicators.
+@property (nonatomic, copy) NSArray * __nonnull indicators;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
@@ -836,29 +888,23 @@ enum TradableInstrumentType : NSInteger;
 SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 @interface TradableInstrument : NSObject
 
-/// The instrument symbol. This is unified across different brokerage accounts and is the symbol to use when referring to the instrument in the API communication.
-@property (nonatomic, readonly, copy) NSString * __nonnull symbol;
-
 /// The symbol that is used to represent the instrument in the brokerage account.
 @property (nonatomic, readonly, copy) NSString * __nonnull brokerageAccountSymbol;
+
+/// The recommended number of decimals when formatting the instrument price.
+@property (nonatomic, readonly) NSInteger decimals;
 
 /// The instrument display name.
 @property (nonatomic, readonly, copy) NSString * __nonnull displayName;
 
-/// A short description of the instrument.
-@property (nonatomic, readonly, copy) NSString * __nonnull shortDescription;
+/// The maximum long order amount for this instrument.
+@property (nonatomic, readonly) double maxAmount;
 
-/// The instrument type.
-@property (nonatomic, readonly) enum TradableInstrumentType type;
-
-/// The pip precisionfor the instrument; specifies at which decimal place the pip is placed.
-@property (nonatomic, readonly) NSInteger pipPrecision;
+/// The maximum short order amount for this instrument. If 0, instrument cannot be shorted.
+@property (nonatomic, readonly) double maxShortAmount;
 
 /// The minimum order amount for this instrument.
 @property (nonatomic, readonly) double minAmount;
-
-/// The maximum order amount for this instrument.
-@property (nonatomic, readonly) double maxAmount;
 
 /// True if order amounts must be multiples of the minimum amount.
 @property (nonatomic, readonly) BOOL multipleOfMinAmount;
@@ -866,11 +912,17 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 /// The quote currency of the instrument
 @property (nonatomic, readonly, copy) NSString * __nonnull quoteCurrency;
 
+/// A short description of the instrument.
+@property (nonatomic, readonly, copy) NSString * __nonnull shortDescription;
+
+/// The instrument symbol. This is unified across different brokerage accounts and is the symbol to use when referring to the instrument in the API communication.
+@property (nonatomic, readonly, copy) NSString * __nonnull symbol;
+
+/// The instrument type.
+@property (nonatomic, readonly) enum TradableInstrumentType type;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol brokerageAccountSymbol:(NSString * __nonnull)brokerageAccountSymbol displayName:(NSString * __nonnull)displayName shortDescription:(NSString * __nonnull)shortDescription type:(enum TradableInstrumentType)type pipPrecision:(NSInteger)pipPrecision minAmount:(double)minAmount maxAmount:(double)maxAmount multipleOfMin:(BOOL)multipleOfMin quoteCurrency:(NSString * __nonnull)quoteCurrency OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -911,12 +963,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOSUser")
 
 /// Name of the user.
 @property (nonatomic, readonly, copy) NSString * __nonnull userName;
-
-/// Thumbnail image of the user.
-@property (nonatomic, strong) UIImage * __nullable userThumbImg;
-
-/// Picture image of the user.
-@property (nonatomic, strong) UIImage * __nullable userPicImg;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
@@ -966,9 +1012,6 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 
 /// Price the order triggers at.
 @property (nonatomic, readonly) double price;
-
-/// Account that the order belongs to.
-@property (nonatomic, readonly, strong) TradableAccount * __nonnull account;
 
 /// Identifier of the affected position. Might not be available.
 @property (nonatomic, readonly, copy) NSString * __nullable affectedPositionId;
@@ -1121,9 +1164,6 @@ SWIFT_CLASS("_TtC11TradableAPI16TradablePosition")
 
 /// Unix timestamp in milliseconds of the position last modification.
 @property (nonatomic, readonly) uint64_t lastModified;
-
-/// Account that the position belongs to.
-@property (nonatomic, readonly, strong) TradableAccount * __nonnull account;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;

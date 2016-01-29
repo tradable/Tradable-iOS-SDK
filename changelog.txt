@@ -1,3 +1,7 @@
+v1.4
+
+- Persisting token in the keychain. Added methods to restore session with a last session token from the keychain.
+
 v1.3:
 
 - Added a method to retrieve the current access token.

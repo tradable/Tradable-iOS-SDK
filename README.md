@@ -12,7 +12,7 @@ Steps to use the API:
 
 2.  When your app is ready to use the TradableAPI, call:
   <pre>
-  Tradable.authenticateWithAppIdAndUri(appId, uri, webView)
+  Tradable.activateOrAuthenticate(appId, uri, webView)
   </pre>
   upon setting the TradableAPIDelegate, where <i>appId</i> is client ID in OAuth flow, and <i>uri</i> is the redirect URI in OAuth flow; <i>webView</i> is an optional UIWebView component that you might use to start the OAuth flow in - if it’s nil, system browser will be used.
 3.  Implement the following UIApplicationDelegate method:
