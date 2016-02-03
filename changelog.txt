@@ -1,3 +1,9 @@
+v1.6
+
+- Added a method to retrieve last session’s close price for specified instruments.
+- Removed closePrice property from TradablePosition.
+
+
 v1.5
 
 - Added indicators support. TradableCandleRequest now has an optional TradableIndicatorRequest property regarding indicators.

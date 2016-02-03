@@ -100,10 +100,11 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @class TradableAccessToken;
 @class UIWebView;
 @class NSURL;
-@class TradableBroker;
-@class TradableError;
-@class TradableApp;
 @class TradableAccount;
+@class TradableLastSessionClose;
+@class TradableError;
+@class TradableBroker;
+@class TradableApp;
 enum TradableUpdateType : NSInteger;
 enum TradableUpdateFrequency : NSInteger;
 @class TradableSymbols;
@@ -180,6 +181,15 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param accessToken The access token to activate the API with.
 - (void)activateAfterLaunchWithAccessToken:(TradableAccessToken * __nonnull)accessToken;
+
+/// Gets the last session's close price for given symbols.
+///
+/// \param forAccount The account for which the prices should be retrieved.
+///
+/// \param symbols The list symbol for which the close prices should be retrieved.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
+- (void)getLastSessionClose:(TradableAccount * __nonnull)forAccount symbols:(NSArray<NSString *> * __nonnull)symbols completion:(void (^ __null_unspecified)(NSArray<TradableLastSessionClose *> * __nullable, TradableError * __nullable))completion;
 
 /// Gets the list of available brokers.
 ///
@@ -1134,6 +1144,28 @@ typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
 /// Exchange-traded fund instrument type.
   TradableInstrumentTypeETF = 3,
 };
+
+
+
+/// Provides information about last session's close price for instrument.
+SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
+@interface TradableLastSessionClose : NSObject
+
+/// The symbol.
+@property (nonatomic, readonly, copy) NSString * __nonnull symbol;
+
+/// The last session's close price.
+@property (nonatomic, readonly) double lastSessionClose;
+
+/// The timestamp of the last session.
+@property (nonatomic, readonly) uint64_t timestamp;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol lastSessionClose:(double)lastSessionClose timestamp:(uint64_t)timestamp OBJC_DESIGNATED_INITIALIZER;
+@end
 
 
 
