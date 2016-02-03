@@ -100,13 +100,15 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @class TradableAccessToken;
 @class UIWebView;
 @class NSURL;
+@class TradableBroker;
+@class TradableError;
+@class TradableApp;
 @class TradableAccount;
 enum TradableUpdateType : NSInteger;
 enum TradableUpdateFrequency : NSInteger;
 @class TradableSymbols;
 enum TradableAggregation : NSInteger;
 @class TradablePosition;
-@class TradableError;
 enum TradableSingleProtection : NSInteger;
 @class TradableOrder;
 @class TradableOrderModification;
@@ -118,6 +120,7 @@ enum TradableSingleProtection : NSInteger;
 @class TradableCandles;
 @class TradableAccountSnapshot;
 @class TradableAccountList;
+@class TradableIndicatorInfo;
 @class TradableOSUser;
 @class TradableInstrument;
 @class TradablePositions;
@@ -177,6 +180,18 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param accessToken The access token to activate the API with.
 - (void)activateAfterLaunchWithAccessToken:(TradableAccessToken * __nonnull)accessToken;
+
+/// Gets the list of available brokers.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableBroker objects and optional TradableError object.
+- (void)getBrokers:(void (^ __null_unspecified)(NSArray<TradableBroker *> * __nullable, TradableError * __nullable))completion;
+
+/// Gets the app information.
+///
+/// \param clientId The ID of the app to retrieve information for.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableApp object and optional TradableError object.
+- (void)getAppInfo:(uint64_t)clientId completion:(void (^ __null_unspecified)(TradableApp * __nullable, TradableError * __nullable))completion;
 
 /// Starts updates for specified account after stopping previous updates.
 ///
@@ -345,6 +360,13 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableAccountList object and optional TradableError object.
 - (void)getAvailableAccounts:(void (^ __null_unspecified)(TradableAccountList * __nullable, TradableError * __nullable))completion;
 
+/// Gets the indicators information.
+///
+/// \param forAccount The account for which the indicators info should be fetched.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableIndicatorInfo objects and optional TradableError object.
+- (void)getIndicatorsInfo:(TradableAccount * __nonnull)forAccount completion:(void (^ __null_unspecified)(NSArray<TradableIndicatorInfo *> * __nullable, TradableError * __nullable))completion;
+
 /// Gets the current OS user.
 ///
 /// \param completion The closure to be called when the response comes back, with optional TradableOSUser object and optional TradableError object.
@@ -472,10 +494,10 @@ SWIFT_PROTOCOL("_TtP11TradableAPI19TradableAPIDelegate_")
 /// \param accounts A TradableAccountList object that contains a list of available accounts.
 - (void)tradableAccountListUpdated:(TradableAccountList * __nonnull)accounts;
 
-/// A delegate hook for metrics updates.
+/// A delegate hook for account metrics updates.
 ///
-/// \param metrics A TradableAccountMetrics object that contains information about current account metrics.
-- (void)tradableMetricsUpdated:(TradableAccountMetrics * __nonnull)metrics;
+/// \param accountMetrics A TradableAccountMetrics object that contains information about current account metrics.
+- (void)tradableAccountMetricsUpdated:(TradableAccountMetrics * __nonnull)accountMetrics;
 
 /// A delegate hook for orders updates.
 ///
@@ -609,7 +631,7 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccountList")
 
 
 
-/// The users balance and other account metrics. All amounts are in account currency. Some fields like, closeProfit and commission are per day, in this context a day in the brokers trading session, and the open and close of such sessions may have different open and close time from broker to broker.
+/// The users balance and other account metrics. All amounts are in account currency.
 SWIFT_CLASS("_TtC11TradableAPI22TradableAccountMetrics")
 @interface TradableAccountMetrics : NSObject
 
@@ -687,6 +709,33 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableAmount")
 - (nonnull instancetype)initWithAmount:(double)amount OBJC_DESIGNATED_INITIALIZER;
 @end
 
+@class UIImage;
+
+
+/// Contains information about an app.
+SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
+@interface TradableApp : NSObject
+
+/// The name of the app.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name iconURL:(NSString * __nonnull)iconURL svgURL:(NSString * __nonnull)svgURL OBJC_DESIGNATED_INITIALIZER;
+
+/// Fetches app icon and caches it.
+///
+/// \param logoCompleted A closure containing an optional app icon.
+- (void)getIcon:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+
+/// Fetches app image and caches it.
+///
+/// \param logoCompleted A closure containing an optional app image.
+- (void)getImage:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+@end
+
 
 
 /// Provides information about a broker available in the system.
@@ -712,7 +761,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableBroker")
 - (nonnull instancetype)initWithBrokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId isLive:(BOOL)isLive brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class UIImage;
 
 
 /// Contains a set of various broker logos for specific account.
@@ -782,6 +830,7 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableCandle")
 - (nonnull instancetype)initWithTimeStamp:(uint64_t)timeStamp open:(double)open close:(double)close high:(double)high low:(double)low volume:(double)volume OBJC_DESIGNATED_INITIALIZER;
 @end
 
+@class TradableIndicatorRequest;
 
 
 /// A historic candle request class, used for requesting historic data.
@@ -800,16 +849,20 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 /// The aggregation interval.
 @property (nonatomic, readonly) enum TradableAggregation aggregation;
 
+/// An optional indicator request.
+@property (nonatomic, readonly, strong) TradableIndicatorRequest * __nullable indicatorRequest;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(enum TradableAggregation)aggregation OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(enum TradableAggregation)aggregation indicatorRequest:(TradableIndicatorRequest * __nullable)indicatorRequest OBJC_DESIGNATED_INITIALIZER;
 @end
 
+@class TradableIndicator;
 
 
-/// Contains a list of candles and a list of indicators.
+/// Contains a list of candles and a list of indicators that the API response contains.
 SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 @interface TradableCandles : NSObject
 
@@ -817,7 +870,7 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 @property (nonatomic, copy) NSArray<TradableCandle *> * __nonnull candles;
 
 /// A list of indicators.
-@property (nonatomic, copy) NSArray * __nonnull indicators;
+@property (nonatomic, copy) NSArray<TradableIndicator *> * __nonnull indicators;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
@@ -880,6 +933,136 @@ typedef SWIFT_ENUM(NSInteger, TradableErrorType) {
 /// The source of the error is unknown, or at least not related to the updates.
   TradableErrorTypeUNKNOWN = 5,
 };
+
+@class TradableIndicatorPlot;
+@class TradableIndicatorParam;
+
+
+/// Provides indicator data.
+SWIFT_CLASS("_TtC11TradableAPI17TradableIndicator")
+@interface TradableIndicator : NSObject
+
+/// The name of the indicator.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// A list of plots of the indicator.
+@property (nonatomic, readonly, copy) NSArray<TradableIndicatorPlot *> * __nonnull plots;
+
+/// A list of used params.
+@property (nonatomic, readonly, copy) NSArray<TradableIndicatorParam *> * __nonnull usedParams;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name plots:(NSArray<TradableIndicatorPlot *> * __nonnull)plots usedParams:(NSArray<TradableIndicatorParam *> * __nonnull)usedParams OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class TradableIndicatorInfoParam;
+
+
+/// Provides information regarding an indicator.
+SWIFT_CLASS("_TtC11TradableAPI21TradableIndicatorInfo")
+@interface TradableIndicatorInfo : NSObject
+
+/// The name of the indicator.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// A short description of the indicator.
+@property (nonatomic, readonly, copy) NSString * __nonnull shortDescription;
+
+/// A list of indicator parameters.
+@property (nonatomic, readonly, copy) NSArray<TradableIndicatorInfoParam *> * __nonnull params;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name shortDescription:(NSString * __nonnull)shortDescription params:(NSArray<TradableIndicatorInfoParam *> * __nonnull)params OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// Describes an allowed indicator parameter.
+SWIFT_CLASS("_TtC11TradableAPI26TradableIndicatorInfoParam")
+@interface TradableIndicatorInfoParam : NSObject
+
+/// The name of the parameter.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// The type of the parameter.
+@property (nonatomic, readonly, copy) NSString * __nonnull type;
+
+/// A default value of the parameter.
+@property (nonatomic, readonly, strong) id __nonnull defaultValue;
+
+/// An optional list of allowed values that this parameter can take.
+@property (nonatomic, readonly, copy) NSArray * __nullable allowedValues;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name type:(NSString * __nonnull)type defaultValue:(id __nonnull)defaultValue allowedValues:(NSArray * __nullable)allowedValues OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// Describes a used indicator parameter.
+SWIFT_CLASS("_TtC11TradableAPI22TradableIndicatorParam")
+@interface TradableIndicatorParam : NSObject
+
+/// The name of the parameter.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// The type of the parameter.
+@property (nonatomic, readonly, copy) NSString * __nonnull type;
+
+/// The value of the parameter.
+@property (nonatomic, readonly, strong) id __nonnull value;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name type:(NSString * __nonnull)type value:(id __nonnull)value OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// Provides information about an indicator plot.
+SWIFT_CLASS("_TtC11TradableAPI21TradableIndicatorPlot")
+@interface TradableIndicatorPlot : NSObject
+
+/// The name of the plot.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// The id of the plot.
+@property (nonatomic, readonly) NSUInteger id;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+@end
+
+@class TradableRequestedIndicator;
+
+
+/// A part of historic candle request regarding requested indicators.
+SWIFT_CLASS("_TtC11TradableAPI24TradableIndicatorRequest")
+@interface TradableIndicatorRequest : NSObject
+
+/// A list of requested indicators.
+@property (nonatomic, readonly, copy) NSArray<TradableRequestedIndicator *> * __nonnull requestedIndicators;
+
+/// An indication of whether the response should contain the candles.
+@property (nonatomic, readonly) BOOL returnCandles;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithRequestedIndicators:(NSArray<TradableRequestedIndicator *> * __nonnull)requestedIndicators returnCandles:(BOOL)returnCandles OBJC_DESIGNATED_INITIALIZER;
+@end
 
 enum TradableInstrumentType : NSInteger;
 
@@ -949,7 +1132,7 @@ typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
   TradableInstrumentTypeEQUITY = 2,
 
 /// Exchange-traded fund instrument type.
-  TradableInstrumentTypeEFT = 3,
+  TradableInstrumentTypeETF = 3,
 };
 
 
@@ -1232,6 +1415,25 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableProtection")
 @end
 
 
+
+/// A part of indicator request with details on requested indicators.
+SWIFT_CLASS("_TtC11TradableAPI26TradableRequestedIndicator")
+@interface TradableRequestedIndicator : NSObject
+
+/// The name of the requested indicator.
+@property (nonatomic, readonly, copy) NSString * __nonnull name;
+
+/// A list of params to be used when calculating the indicator.
+@property (nonatomic, readonly, copy) NSArray<TradableIndicatorParam *> * __nonnull params;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithName:(NSString * __nonnull)name params:(NSArray<TradableIndicatorParam *> * __nonnull)params OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
 /// Available protection types.
 typedef SWIFT_ENUM(NSInteger, TradableSingleProtection) {
 
@@ -1253,6 +1455,12 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableSymbols")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// A convenience initializer that creates TradableSymbols object with a list of symbols.
+- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * __nonnull)symbols;
+
+/// A builder pattern method that allows to append a symbol to this object's list of symbols.
+- (TradableSymbols * __nonnull)withSymbol:(NSString * __nonnull)symbol;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -1291,7 +1499,7 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateFrequency) {
 /// Update type for managed mode.
 typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 
-/// Updates for account snapshot, orders, positions and prices. A list of symbols should be specified for this update type.
+/// Updates for account snapshot, orders, positions and prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
   TradableUpdateTypeFull = 0,
 
 /// Updates just for account positions.
@@ -1300,7 +1508,7 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 /// Updates just for account orders.
   TradableUpdateTypeOrders = 2,
 
-/// Updates just for tick prices. A list of symbols should be specified for this update type.
+/// Updates just for tick prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
   TradableUpdateTypePrices = 3,
 };
 

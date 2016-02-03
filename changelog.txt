@@ -1,6 +1,17 @@
+v1.5
+
+- Added indicators support. TradableCandleRequest now has an optional TradableIndicatorRequest property regarding indicators.
+- Added a method to get app information.
+- Added a method to get a list of available brokers.
+- Added a convenience initializer and a builder pattern method to TradableSymbols.
+- Renamed TradableAPIDelegate method tradableMetricsUpdated() to tradableAccountMetricsUpdated().
+- Renamed TradableAccountMetrics properties: availableForTrading to amountAvailableForTrading, marginUsed to marginAmountUsed.
+
+
 v1.4
 
 - Persisting token in the keychain. Added methods to restore session with a last session token from the keychain.
+
 
 v1.3:
 
