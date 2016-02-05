@@ -1,7 +1,7 @@
 Tradable Embed for iOS - build financial trading capabilities into your apps.
 Swift and Objective-C compatible.
 
-Learn more at https://embed.tradable.com.
+Learn more at https://tradable.com.
 
 Read documentation at http://tradable.github.io/ios/docs/.
 
@@ -24,4 +24,4 @@ Steps to use the API:
     return true
   }
   </pre>
-4. Listen for <i>tradableReady()</i> delegate method call. The API is ready to be used!
+4. Listen for <i>tradableReady()</i> auth delegate method call. The API is ready to be used!

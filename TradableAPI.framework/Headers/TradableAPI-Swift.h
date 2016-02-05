@@ -103,6 +103,10 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @class TradableAccount;
 @class TradableLastSessionClose;
 @class TradableError;
+@class TradableAPIAuthenticationRequest;
+@class TradableAPIAuthentication;
+@class TradableDemoAPIAuthenticationRequest;
+@class TradableAPIRefreshAuthenticationRequest;
 @class TradableBroker;
 @class TradableApp;
 enum TradableUpdateType : NSInteger;
@@ -132,15 +136,19 @@ enum TradableOrderSide : NSInteger;
 @protocol TradableInstrumentSelectorDelegate;
 @protocol TradableEditOrderDelegate;
 @protocol TradablePositionDetailDelegate;
-@protocol TradableAPIDelegate;
+@protocol TradableEventsDelegate;
+@protocol TradableAuthDelegate;
 
 
 /// The Tradable object implementing the singleton pattern.
 SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 @interface Tradable : NSObject
 
-/// TradableAPI delegate for hooking into update responses.
-@property (nonatomic, weak) id <TradableAPIDelegate> __nullable delegate;
+/// Tradable events delegate for hooking into update responses.
+@property (nonatomic, weak) id <TradableEventsDelegate> __nullable delegate;
+
+/// Tradable auth delegate for hooking into auth responses.
+@property (nonatomic, weak) id <TradableAuthDelegate> __nullable authDelegate;
 
 /// A singleton object used to invoke API methods on.
 + (Tradable * __nonnull)sharedInstance;
@@ -172,12 +180,12 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param webView Optional UIWebView component used to open login website. If not specified, system browser will be opened.
 + (void)authenticateWithAppIdAndUri:(uint64_t)appId uri:(NSString * __nonnull)uri webView:(UIWebView * __nullable)webView;
 
-/// Tells the API to activate with URL containing access token. Should be called when system browser opens the application using TradableAPI. When the access token is successfully created, tradableReady delegate method is called.
+/// Tells the API to activate with URL containing access token. Should be called when system browser opens the application using TradableAPI. When the access token is successfully created, tradableReady auth delegate method is called.
 ///
 /// \param url URL containing information needed in order to create access token.
 - (void)activateAfterLaunchWithURL:(NSURL * __nonnull)url;
 
-/// Tells the API to activate with an access token. When the activation is successful, tradableReady delegate method is called.
+/// Tells the API to activate with an access token. When the activation is successful, tradableReady auth delegate method is called.
 ///
 /// \param accessToken The access token to activate the API with.
 - (void)activateAfterLaunchWithAccessToken:(TradableAccessToken * __nonnull)accessToken;
@@ -190,6 +198,27 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
 - (void)getLastSessionClose:(TradableAccount * __nonnull)forAccount symbols:(NSArray<NSString *> * __nonnull)symbols completion:(void (^ __null_unspecified)(NSArray<TradableLastSessionClose *> * __nullable, TradableError * __nullable))completion;
+
+/// Provides a token granting access to the account(s) associated with the given login.
+///
+/// \param authRequest The authentication request to be sent.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableAPIAuthentication object and optional TradableError object.
+- (void)authenticate:(TradableAPIAuthenticationRequest * __nonnull)authRequest completion:(void (^ __null_unspecified)(TradableAPIAuthentication * __nullable, TradableError * __nullable))completion;
+
+/// Creates a demo account of the specified type and returns an authentication granting access to that account.
+///
+/// \param demoAuthRequest The demo authentication request to be sent.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableAPIAuthentication object and optional TradableError object.
+- (void)createDemoAccount:(TradableDemoAPIAuthenticationRequest * __nonnull)demoAuthRequest completion:(void (^ __null_unspecified)(TradableAPIAuthentication * __nullable, TradableError * __nullable))completion;
+
+/// Refreshes the authentication that was granted when the refresh token was issued.
+///
+/// \param refreshAuthRequest The refresh authentication request to be sent.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableAPIAuthentication object and optional TradableError object.
+- (void)refreshAuthentication:(TradableAPIRefreshAuthenticationRequest * __nonnull)refreshAuthRequest completion:(void (^ __null_unspecified)(TradableAPIAuthentication * __nullable, TradableError * __nullable))completion;
 
 /// Gets the list of available brokers.
 ///
@@ -435,6 +464,15 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional array of TradableOrder objects and optional TradableError object.
 - (void)getPendingOrders:(TradableAccount * __nonnull)forAccount completion:(void (^ __null_unspecified)(NSArray<TradableOrder *> * __nullable, TradableError * __nullable))completion;
 
+/// Gets instrument by specifying symbol and account.
+///
+/// \param forAccount The account for which the isntrument will be retrieved.
+///
+/// \param symbol The symbol under which the instrument is to be found.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableInstrument object and optional TradableError object.
+- (void)getInstrumentBySymbol:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol completion:(void (^ __null_unspecified)(TradableInstrument * __nullable, TradableError * __nullable))completion;
+
 /// Presents Order Entry widget.
 ///
 /// \param forAccount The account for which the widget should be presented.
@@ -488,51 +526,76 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 - (void)presentPositionDetail:(TradableAccount * __nonnull)forAccount position:(TradablePosition * __nonnull)position delegate:(id <TradablePositionDetailDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
 @end
 
-@class TradableAccountMetrics;
 
 
-/// The delegate protocol for the API. Provides a variety of hooks.
-SWIFT_PROTOCOL("_TtP11TradableAPI19TradableAPIDelegate_")
-@protocol TradableAPIDelegate
-@optional
+/// An API authentication token granting access to the accounts associated with the broker login used to create it.
+SWIFT_CLASS("_TtC11TradableAPI25TradableAPIAuthentication")
+@interface TradableAPIAuthentication : NSObject
 
-/// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated.
-- (void)tradableReady;
+/// The access token value.
+@property (nonatomic, readonly, copy) NSString * __nonnull apiTokenValue;
 
-/// A delegate hook for knowing when the account list has been updated.
-///
-/// \param accounts A TradableAccountList object that contains a list of available accounts.
-- (void)tradableAccountListUpdated:(TradableAccountList * __nonnull)accounts;
+/// The refresh token value to use in order to refresh the API authentication.
+@property (nonatomic, readonly, copy) NSString * __nonnull apiRefreshTokenValue;
 
-/// A delegate hook for account metrics updates.
-///
-/// \param accountMetrics A TradableAccountMetrics object that contains information about current account metrics.
-- (void)tradableAccountMetricsUpdated:(TradableAccountMetrics * __nonnull)accountMetrics;
+/// The endpoint to send API requests to.
+@property (nonatomic, readonly, copy) NSString * __nonnull apiEndpoint;
 
-/// A delegate hook for orders updates.
-///
-/// \param orders A TradableOrders object that contains a list of orders.
-- (void)tradableOrdersUpdated:(TradableOrders * __nonnull)orders;
+/// The expiry date (in milliseconds) of the access token.
+@property (nonatomic, readonly) uint64_t expires;
 
-/// A delegate hook for positions updates.
-///
-/// \param positions A TradablePositions object that contains a list of positions.
-- (void)tradablePositionsUpdated:(TradablePositions * __nonnull)positions;
+/// The expiry date (in milliseconds) of the refresh token.
+@property (nonatomic, readonly) uint64_t refreshTokenExpires;
 
-/// A delegate hook for prices updates.
-///
-/// \param prices A list of TradablePrice objects.
-- (void)tradablePricesUpdated:(NSArray<TradablePrice *> * __nonnull)prices;
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
 
-/// A delegate hook for candles updates.
-///
-/// \param candles A TradableCandles object that contains a list of candles.
-- (void)tradableCandlesUpdated:(TradableCandles * __nonnull)candles;
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithApiTokenValue:(NSString * __nonnull)apiTokenValue apiRefreshTokenValue:(NSString * __nonnull)apiRefreshTokenValue apiEndpoint:(NSString * __nonnull)apiEndpoint expires:(uint64_t)expires refreshTokenExpires:(uint64_t)refreshTokenExpires OBJC_DESIGNATED_INITIALIZER;
+@end
 
-/// A delegate hook for updates error handling.
-///
-/// \param error A TradableError object that contains detailed information about the error.
-- (void)tradableUpdateError:(TradableError * __nonnull)error;
+
+
+/// A request for an authentication token granting access to the accounts associated with the given broker login.
+SWIFT_CLASS("_TtC11TradableAPI32TradableAPIAuthenticationRequest")
+@interface TradableAPIAuthenticationRequest : NSObject
+
+/// The id of the app that is requesting access.
+@property (nonatomic, readonly) uint64_t appId;
+
+/// The id of the broker that the account is at.
+@property (nonatomic, readonly) NSInteger brokerId;
+
+/// The login for the account.
+@property (nonatomic, readonly, copy) NSString * __nonnull login;
+
+/// The password for the account.
+@property (nonatomic, readonly, copy) NSString * __nonnull password;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * __nonnull)login password:(NSString * __nonnull)password OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// A request to refresh the authentication that was granted when the refresh token was issued.
+SWIFT_CLASS("_TtC11TradableAPI39TradableAPIRefreshAuthenticationRequest")
+@interface TradableAPIRefreshAuthenticationRequest : NSObject
+
+/// The value of the refresh token.
+@property (nonatomic, readonly, copy) NSString * __nonnull refreshTokenValue;
+
+/// The client secret of the app that is requesting the refresh.
+@property (nonatomic, readonly, copy) NSString * __nonnull appSecret;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithRefreshTokenValue:(NSString * __nonnull)refreshTokenValue appSecret:(NSString * __nonnull)appSecret OBJC_DESIGNATED_INITIALIZER;
 @end
 
 @class NSDate;
@@ -620,9 +683,6 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithId:(NSString * __nonnull)id displayName:(NSString * __nonnull)displayName brokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId brokerageAccountId:(NSString * __nonnull)brokerageAccountId brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos endpointUrl:(NSString * __nonnull)endpointUrl currencyIsoCode:(NSString * __nonnull)currencyIsoCode currencySign:(NSString * __nonnull)currencySign externalBackofficeReport:(NSString * __nullable)externalBackofficeReport isLiveAccount:(BOOL)isLiveAccount trackConfiguration:(enum TradableTrackConfiguration)trackConfiguration stopLossSupported:(BOOL)stopLossSupported takeProfitSupported:(BOOL)takeProfitSupported OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -669,9 +729,6 @@ SWIFT_CLASS("_TtC11TradableAPI23TradableAccountSnapshot")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithMetrics:(TradableAccountMetrics * __nonnull)metrics orders:(TradableOrders * __nonnull)orders positions:(TradablePositions * __nonnull)positions prices:(NSArray<TradablePrice *> * __nonnull)prices OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -732,9 +789,6 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithName:(NSString * __nonnull)name iconURL:(NSString * __nonnull)iconURL svgURL:(NSString * __nonnull)svgURL OBJC_DESIGNATED_INITIALIZER;
-
 /// Fetches app icon and caches it.
 ///
 /// \param logoCompleted A closure containing an optional app icon.
@@ -744,6 +798,17 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 ///
 /// \param logoCompleted A closure containing an optional app image.
 - (void)getImage:(void (^ __null_unspecified)(UIImage * __nullable))logoCompleted;
+@end
+
+
+
+/// The delegate protocol for authentication/authorization events.
+SWIFT_PROTOCOL("_TtP11TradableAPI20TradableAuthDelegate_")
+@protocol TradableAuthDelegate
+@optional
+
+/// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated.
+- (void)tradableReady;
 @end
 
 
@@ -766,9 +831,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableBroker")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithBrokerName:(NSString * __nonnull)brokerName brokerId:(NSInteger)brokerId isLive:(BOOL)isLive brokerLogos:(TradableBrokerLogos * __nonnull)brokerLogos OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -779,9 +841,6 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSmall:(NSString * __nonnull)small onLight:(NSString * __nonnull)onLight onDark:(NSString * __nonnull)onDark svg:(NSString * __nonnull)svg svgSolid:(NSString * __nonnull)svgSolid OBJC_DESIGNATED_INITIALIZER;
 
 /// Fetches small broker logo and caches it.
 ///
@@ -887,6 +946,37 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
+enum TradableDemoAccountType : NSInteger;
+
+
+/// A request for creating a demo account of the given type and an authentication granting access to it.
+SWIFT_CLASS("_TtC11TradableAPI36TradableDemoAPIAuthenticationRequest")
+@interface TradableDemoAPIAuthenticationRequest : NSObject
+
+/// The id of the app that is requesting access.
+@property (nonatomic, readonly) uint64_t appId;
+
+/// The type of demo account.
+@property (nonatomic, readonly) enum TradableDemoAccountType type;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppId:(uint64_t)appId type:(enum TradableDemoAccountType)type OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+/// Possible types of Tradable demo accounts.
+typedef SWIFT_ENUM(NSInteger, TradableDemoAccountType) {
+
+/// Account with Forex instruments.
+  TradableDemoAccountTypeFOREX = 0,
+
+/// Account with stocks.
+  TradableDemoAccountTypeSTOCKS = 1,
+};
+
 
 
 /// The delegate protocol for the Edit Order widget.
@@ -944,6 +1034,49 @@ typedef SWIFT_ENUM(NSInteger, TradableErrorType) {
   TradableErrorTypeUNKNOWN = 5,
 };
 
+
+
+/// The delegate protocol for events such as receiving account metrics or errors. Provides a variety of hooks.
+SWIFT_PROTOCOL("_TtP11TradableAPI22TradableEventsDelegate_")
+@protocol TradableEventsDelegate
+@optional
+
+/// A delegate hook for knowing when the account list has been updated.
+///
+/// \param accounts A TradableAccountList object that contains a list of available accounts.
+- (void)tradableAccountListUpdated:(TradableAccountList * __nonnull)accounts;
+
+/// A delegate hook for account metrics updates.
+///
+/// \param accountMetrics A TradableAccountMetrics object that contains information about current account metrics.
+- (void)tradableAccountMetricsUpdated:(TradableAccountMetrics * __nonnull)accountMetrics;
+
+/// A delegate hook for orders updates.
+///
+/// \param orders A TradableOrders object that contains a list of orders.
+- (void)tradableOrdersUpdated:(TradableOrders * __nonnull)orders;
+
+/// A delegate hook for positions updates.
+///
+/// \param positions A TradablePositions object that contains a list of positions.
+- (void)tradablePositionsUpdated:(TradablePositions * __nonnull)positions;
+
+/// A delegate hook for prices updates.
+///
+/// \param prices A list of TradablePrice objects.
+- (void)tradablePricesUpdated:(NSArray<TradablePrice *> * __nonnull)prices;
+
+/// A delegate hook for candles updates.
+///
+/// \param candles A TradableCandles object that contains a list of candles.
+- (void)tradableCandlesUpdated:(TradableCandles * __nonnull)candles;
+
+/// A delegate hook for updates error handling.
+///
+/// \param error A TradableError object that contains detailed information about the error.
+- (void)tradableUpdateError:(TradableError * __nonnull)error;
+@end
+
 @class TradableIndicatorPlot;
 @class TradableIndicatorParam;
 
@@ -963,9 +1096,6 @@ SWIFT_CLASS("_TtC11TradableAPI17TradableIndicator")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithName:(NSString * __nonnull)name plots:(NSArray<TradableIndicatorPlot *> * __nonnull)plots usedParams:(NSArray<TradableIndicatorParam *> * __nonnull)usedParams OBJC_DESIGNATED_INITIALIZER;
 @end
 
 @class TradableIndicatorInfoParam;
@@ -986,9 +1116,6 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableIndicatorInfo")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithName:(NSString * __nonnull)name shortDescription:(NSString * __nonnull)shortDescription params:(NSArray<TradableIndicatorInfoParam *> * __nonnull)params OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1011,9 +1138,6 @@ SWIFT_CLASS("_TtC11TradableAPI26TradableIndicatorInfoParam")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithName:(NSString * __nonnull)name type:(NSString * __nonnull)type defaultValue:(id __nonnull)defaultValue allowedValues:(NSArray * __nullable)allowedValues OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1162,9 +1286,6 @@ SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol lastSessionClose:(double)lastSessionClose timestamp:(uint64_t)timestamp OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1181,9 +1302,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOSUser")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithUserId:(NSString * __nonnull)userId userName:(NSString * __nonnull)userName userThumb:(NSString * __nonnull)userThumb userPic:(NSString * __nonnull)userPic OBJC_DESIGNATED_INITIALIZER;
 
 /// Fetches a thumbnail and caches it.
 ///

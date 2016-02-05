@@ -1,3 +1,11 @@
+v1.7
+
+- Split TradableAPIDelegate into TradableAuthDelegate with tradableReady() optional method and TradableEventsDelegate with the remaining optional methods.
+- Added support for direct authentication.
+- Added a helper method to get a TradableInstrument object by symbol for account.
+- Made most initializers inaccessible in order to avoid confusion about which objects come with a response and which should be sent with a request.
+
+
 v1.6
 
 - Added a method to retrieve last session’s close price for specified instruments.
