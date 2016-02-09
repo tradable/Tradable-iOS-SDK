@@ -120,6 +120,7 @@ enum TradableSingleProtection : NSInteger;
 @class TradableProtection;
 @class TradableAmount;
 @class TradableOrderCommand;
+enum TradableOrderSide : NSInteger;
 @class TradablePrice;
 @class TradableCandleRequest;
 @class TradableCandles;
@@ -130,7 +131,6 @@ enum TradableSingleProtection : NSInteger;
 @class TradableInstrument;
 @class TradablePositions;
 @class TradableOrders;
-enum TradableOrderSide : NSInteger;
 @protocol TradableOrderEntryDelegate;
 @class UIViewController;
 @protocol TradableInstrumentSelectorDelegate;
@@ -138,6 +138,7 @@ enum TradableOrderSide : NSInteger;
 @protocol TradablePositionDetailDelegate;
 @protocol TradableEventsDelegate;
 @protocol TradableAuthDelegate;
+@protocol TradableSearchDelegate;
 
 
 /// The Tradable object implementing the singleton pattern.
@@ -149,6 +150,9 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// Tradable auth delegate for hooking into auth responses.
 @property (nonatomic, weak) id <TradableAuthDelegate> __nullable authDelegate;
+
+/// Tradable search delegate for hooking into search results.
+@property (nonatomic, weak) id <TradableSearchDelegate> __nullable searchDelegate;
 
 /// A singleton object used to invoke API methods on.
 + (Tradable * __nonnull)sharedInstance;
@@ -362,8 +366,21 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param orderCommand The order command object, containing information about the order that should be issued.
 ///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object.
+/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewOrder:(TradableAccount * __nonnull)forAccount orderCommand:(TradableOrderCommand * __nonnull)orderCommand completion:(void (^ __null_unspecified)(TradableOrder * __nullable, TradableError * __nullable))completion;
+
+/// Issues new market order.
+///
+/// \param forAccount The account for which the order should be issued.
+///
+/// \param symbol The symbol for which the order should be issued.
+///
+/// \param amount The amount of the order.
+///
+/// \param side The side of the order.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewMarketOrder:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side completion:(void (^ __null_unspecified)(TradableOrder * __nullable, TradableError * __nullable))completion;
 
 /// Gets prices.
 ///
@@ -466,12 +483,19 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// Gets instrument by specifying symbol and account.
 ///
-/// \param forAccount The account for which the isntrument will be retrieved.
+/// \param forAccount The account for which the instrument will be retrieved.
 ///
 /// \param symbol The symbol under which the instrument is to be found.
 ///
 /// \param completion The closure to be called when the response comes back, with optional TradableInstrument object and optional TradableError object.
 - (void)getInstrumentBySymbol:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol completion:(void (^ __null_unspecified)(TradableInstrument * __nullable, TradableError * __nullable))completion;
+
+/// Searches for instruments that contain a specified phrase. Returns the results using current searchDelegate's tradableInstrumentsFound method.
+///
+/// \param forAccount The account for which the instruments will be searched for.
+///
+/// \param searchPhrase The phrase that the instruments will be searched for.
+- (void)searchForInstruments:(TradableAccount * __nonnull)forAccount searchPhrase:(NSString * __nonnull)searchPhrase;
 
 /// Presents Order Entry widget.
 ///
@@ -802,7 +826,7 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 
 
 
-/// The delegate protocol for authentication/authorization events.
+/// A delegate protocol for authentication/authorization events.
 SWIFT_PROTOCOL("_TtP11TradableAPI20TradableAuthDelegate_")
 @protocol TradableAuthDelegate
 @optional
@@ -1036,7 +1060,7 @@ typedef SWIFT_ENUM(NSInteger, TradableErrorType) {
 
 
 
-/// The delegate protocol for events such as receiving account metrics or errors. Provides a variety of hooks.
+/// A delegate protocol for events such as receiving account metrics or errors. Provides a variety of hooks.
 SWIFT_PROTOCOL("_TtP11TradableAPI22TradableEventsDelegate_")
 @protocol TradableEventsDelegate
 @optional
@@ -1370,7 +1394,7 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderCommand")
 /// Amount of the order.
 @property (nonatomic, readonly) double amount;
 
-/// Trigger price for the order.
+/// Trigger price for the order. Use 0.0 for market orders.
 @property (nonatomic, readonly) double price;
 
 /// Order side.
@@ -1581,6 +1605,19 @@ SWIFT_CLASS("_TtC11TradableAPI26TradableRequestedIndicator")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithName:(NSString * __nonnull)name params:(NSArray<TradableIndicatorParam *> * __nonnull)params OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// A delegate protocol for getting back the search results.
+SWIFT_PROTOCOL("_TtP11TradableAPI22TradableSearchDelegate_")
+@protocol TradableSearchDelegate
+@optional
+
+/// A delegate hook for getting back the search results.
+///
+/// \param instruments A list of TradableInstrument objects that matched the search phrase.
+- (void)tradableInstrumentsFound:(NSArray<TradableInstrument *> * __nonnull)instruments;
 @end
 
 

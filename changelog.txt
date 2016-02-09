@@ -1,3 +1,10 @@
+v1.8
+
+- Added a method to search for instruments with a string and an optional delegate with an optional method for getting back search results.
+- Added a method to issue a market order.
+- Amended UI widgets for equities and ETFs.
+
+
 v1.7
 
 - Split TradableAPIDelegate into TradableAuthDelegate with tradableReady() optional method and TradableEventsDelegate with the remaining optional methods.
