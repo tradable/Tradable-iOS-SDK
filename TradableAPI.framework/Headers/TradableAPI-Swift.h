@@ -121,7 +121,7 @@ enum TradableSingleProtection : NSInteger;
 @class TradableAmount;
 @class TradableOrderCommand;
 enum TradableOrderSide : NSInteger;
-@class TradablePrice;
+@class TradablePrices;
 @class TradableCandleRequest;
 @class TradableCandles;
 @class TradableAccountSnapshot;
@@ -389,7 +389,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param symbols The symbols for which the prices should be fetched.
 ///
 /// \param completion The closure to be called when the response comes back, with optional array of TradablePrice objects and optional TradableError object.
-- (void)getPrices:(TradableAccount * __nonnull)forAccount symbols:(TradableSymbols * __nonnull)symbols completion:(void (^ __null_unspecified)(NSArray<TradablePrice *> * __nullable, TradableError * __nullable))completion;
+- (void)getPrices:(TradableAccount * __nonnull)forAccount symbols:(TradableSymbols * __nonnull)symbols completion:(void (^ __null_unspecified)(TradablePrices * __nullable, TradableError * __nullable))completion;
 
 /// Gets candles.\Remark 
 ///
@@ -749,7 +749,7 @@ SWIFT_CLASS("_TtC11TradableAPI23TradableAccountSnapshot")
 @property (nonatomic, readonly, strong) TradablePositions * __nonnull positions;
 
 /// The tick prices for symbols the request was made for.
-@property (nonatomic, readonly, copy) NSArray<TradablePrice *> * __nonnull prices;
+@property (nonatomic, readonly, strong) TradablePrices * __nonnull prices;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
@@ -1087,8 +1087,8 @@ SWIFT_PROTOCOL("_TtP11TradableAPI22TradableEventsDelegate_")
 
 /// A delegate hook for prices updates.
 ///
-/// \param prices A list of TradablePrice objects.
-- (void)tradablePricesUpdated:(NSArray<TradablePrice *> * __nonnull)prices;
+/// \param prices A TradablePrices object containing a dictionary of symbols to TradablePrice objects.
+- (void)tradablePricesUpdated:(TradablePrices * __nonnull)prices;
 
 /// A delegate hook for candles updates.
 ///
@@ -1567,6 +1567,25 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
+@end
+
+
+
+/// Contains a dictionary of symbols to TradablePrice objects.
+SWIFT_CLASS("_TtC11TradableAPI14TradablePrices")
+@interface TradablePrices : NSObject
+
+/// A dictionary of symbols to TradablePrice objects.
+@property (nonatomic, readonly, copy) NSDictionary<NSString *, TradablePrice *> * __nonnull prices;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Returns the dictionary values as an array.
+- (NSArray<TradablePrice *> * __nonnull)getPrices;
+
+/// Returns an optional TradablePrice object for specified symbol.
+- (TradablePrice * __nullable)getPriceForSymbol:(NSString * __nonnull)symbol;
 @end
 
 

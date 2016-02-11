@@ -1,3 +1,13 @@
+v1.9
+
+- Added a TradablePrices wrapper for TradablePrice.
+- BREAKING CHANGE: TradableAccountSnapshot’s prices property type has been changed to TradablePrices.
+- BREAKING CHANGE: TradableEventsDelegate’s tradablePricesUpdated method has been changed to return TradablePrices object.
+(Note: For compatibility, a getPrices() method has been provided on TradablePrices objects, which returns a list of TradablePrice objects.)
+- Amended UI widgets to reflect account’s support for stop loss and take profit.
+- Improved search method in terms of ordering instruments and stripping special characters.
+
+
 v1.8
 
 - Added a method to search for instruments with a string and an optional delegate with an optional method for getting back search results.
