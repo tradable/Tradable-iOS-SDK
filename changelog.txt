@@ -1,3 +1,12 @@
+v1.10
+
+- Changed aggregation property of TradableCandleRequest to be of type Int to allow for derived aggregations. TradableAggregation.rawValue may be used for compatibility.
+- Changed aggregation parameter of startCandleUpdates method to be of type Int to allow for derived aggregations. TradableAggregation.rawValue may be used for compatibility.
+- Added executionPrice property to TradableOrder.
+- Added exchangeId property to TradableInstrument.
+- Added new instrument type to TradableInstrumentType enum: ADR.
+
+
 v1.9
 
 - Added a TradablePrices wrapper for TradablePrice.

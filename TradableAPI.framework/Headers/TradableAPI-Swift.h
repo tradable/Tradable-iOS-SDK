@@ -112,7 +112,6 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 enum TradableUpdateType : NSInteger;
 enum TradableUpdateFrequency : NSInteger;
 @class TradableSymbols;
-enum TradableAggregation : NSInteger;
 @class TradablePosition;
 enum TradableSingleProtection : NSInteger;
 @class TradableOrder;
@@ -261,10 +260,10 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param symbol The symbol for which the updates should be started.
 ///
-/// \param aggregation The aggregation for which the updates should be started.
+/// \param aggregation The aggregation (in minutes) for which the updates should be started.
 ///
 /// \param from Unix timestamp in milliseconds, specifies since when should the candles be requested. Cannot be greater than the current timestamp.
-- (void)startCandleUpdates:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol aggregation:(enum TradableAggregation)aggregation from:(uint64_t)from;
+- (void)startCandleUpdates:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol aggregation:(NSInteger)aggregation from:(uint64_t)from;
 
 /// Stops candle updates.
 - (void)stopCandleUpdates;
@@ -550,11 +549,13 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 - (void)presentPositionDetail:(TradableAccount * __nonnull)forAccount position:(TradablePosition * __nonnull)position delegate:(id <TradablePositionDetailDelegate> __nullable)delegate presentingViewController:(UIViewController * __nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
 @end
 
+@class NSDate;
+@class NSCoder;
 
 
 /// An API authentication token granting access to the accounts associated with the broker login used to create it.
 SWIFT_CLASS("_TtC11TradableAPI25TradableAPIAuthentication")
-@interface TradableAPIAuthentication : NSObject
+@interface TradableAPIAuthentication : NSObject <NSCoding>
 
 /// The access token value.
 @property (nonatomic, readonly, copy) NSString * __nonnull apiTokenValue;
@@ -565,17 +566,26 @@ SWIFT_CLASS("_TtC11TradableAPI25TradableAPIAuthentication")
 /// The endpoint to send API requests to.
 @property (nonatomic, readonly, copy) NSString * __nonnull apiEndpoint;
 
-/// The expiry date (in milliseconds) of the access token.
-@property (nonatomic, readonly) uint64_t expires;
+/// The expiration date of the access token.
+@property (nonatomic, readonly, strong) NSDate * __nonnull expirationDate;
 
-/// The expiry date (in milliseconds) of the refresh token.
-@property (nonatomic, readonly) uint64_t refreshTokenExpires;
+/// The expiration date of the refresh token.
+@property (nonatomic, readonly, strong) NSDate * __nonnull refreshTokenExpirationDate;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithApiTokenValue:(NSString * __nonnull)apiTokenValue apiRefreshTokenValue:(NSString * __nonnull)apiRefreshTokenValue apiEndpoint:(NSString * __nonnull)apiEndpoint expires:(uint64_t)expires refreshTokenExpires:(uint64_t)refreshTokenExpires OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithApiTokenValue:(NSString * __nonnull)apiTokenValue apiRefreshTokenValue:(NSString * __nonnull)apiRefreshTokenValue apiEndpoint:(NSString * __nonnull)apiEndpoint expirationDate:(NSDate * __nonnull)expirationDate refreshTokenExpirationDate:(NSDate * __nonnull)refreshTokenExpirationDate OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * __nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * __nonnull)coder;
 @end
 
 
@@ -622,8 +632,6 @@ SWIFT_CLASS("_TtC11TradableAPI39TradableAPIRefreshAuthenticationRequest")
 - (nonnull instancetype)initWithRefreshTokenValue:(NSString * __nonnull)refreshTokenValue appSecret:(NSString * __nonnull)appSecret OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSDate;
-@class NSCoder;
 
 
 /// Access token wrapper.
@@ -939,8 +947,8 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 /// The end of the candle range; Unix timestamp in milliseconds.
 @property (nonatomic, readonly) uint64_t to;
 
-/// The aggregation interval.
-@property (nonatomic, readonly) enum TradableAggregation aggregation;
+/// The aggregation interval in minutes.
+@property (nonatomic, readonly) NSInteger aggregation;
 
 /// An optional indicator request.
 @property (nonatomic, readonly, strong) TradableIndicatorRequest * __nullable indicatorRequest;
@@ -949,7 +957,7 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(enum TradableAggregation)aggregation indicatorRequest:(TradableIndicatorRequest * __nullable)indicatorRequest OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithSymbol:(NSString * __nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(NSInteger)aggregation indicatorRequest:(TradableIndicatorRequest * __nullable)indicatorRequest OBJC_DESIGNATED_INITIALIZER;
 @end
 
 @class TradableIndicator;
@@ -1238,6 +1246,9 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 /// The instrument display name.
 @property (nonatomic, readonly, copy) NSString * __nonnull displayName;
 
+/// The exchange this instrument is traded on. May be not available if the exchange is unknown.
+@property (nonatomic, readonly, copy) NSString * __nullable exchangeId;
+
 /// The maximum long order amount for this instrument.
 @property (nonatomic, readonly) double maxAmount;
 
@@ -1280,17 +1291,20 @@ SWIFT_PROTOCOL("_TtP11TradableAPI34TradableInstrumentSelectorDelegate_")
 /// Available instrument types.
 typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
 
-/// Foreign exchange instrument type.
+/// Foreign exchange.
   TradableInstrumentTypeFOREX = 0,
 
-/// Contract for difference instrument type.
+/// Contract for difference.
   TradableInstrumentTypeCFD = 1,
 
-/// Equity instrument type.
+/// Equity.
   TradableInstrumentTypeEQUITY = 2,
 
-/// Exchange-traded fund instrument type.
+/// Exchange-traded fund.
   TradableInstrumentTypeETF = 3,
+
+/// American depositary receipt.
+  TradableInstrumentTypeADR = 4,
 };
 
 
