@@ -1,3 +1,15 @@
+v1.11
+
+- Added an initializer to TradableCandleRequest that takes NSDate as from and to params.
+- Added property to TradableApp containing a list of brokers available for use with the app.
+- Added orders support properties to TradableAccount.
+- Added stop loss distance and take profit distance properties to TradableOrder and TradableOrderCommand.
+- Amended TradableOrder with a convenience method for retrieving its last known state.
+- Amended issueNewMarketOrder to take an optional TradableOrderStatusDelegate as a param. The delegate will be notified if the updates are running and the order status changes.
+- Made account creation/authentication/activation flow easier. For demo accounts, use activateOrCreate, for live accounts, use activateOrAuthenticate.
+- Removed method for getting last session token. Moved token disposal method to TradableAccessToken.
+
+
 v1.10
 
 - Changed aggregation property of TradableCandleRequest to be of type Int to allow for derived aggregations. TradableAggregation.rawValue may be used for compatibility.
