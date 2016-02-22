@@ -121,6 +121,7 @@ enum TradableSingleProtection : NSInteger;
 @class TradableOrderCommand;
 enum TradableOrderSide : NSInteger;
 @protocol TradableOrderStatusDelegate;
+@class TradableDistance;
 @class TradablePrices;
 @class TradableCandleRequest;
 @class TradableCandles;
@@ -247,7 +248,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param frequency The frequency of the updates.
 ///
-/// \param symbols An optional list of symbols for which the updates should be started. Should be specified for full updates and price updates.
+/// \param symbols An optional list of symbols for which the updates should be started. Should be specified for full updates and price updates. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to symbols array to get prices for portfolio's symbols.
 - (void)startUpdates:(TradableAccount * __nonnull)forAccount updateType:(enum TradableUpdateType)updateType frequency:(enum TradableUpdateFrequency)frequency symbols:(TradableSymbols * __nullable)symbols;
 
 /// Set symbols for updates.
@@ -386,6 +387,25 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewMarketOrder:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side orderDelegate:(id <TradableOrderStatusDelegate> __nullable)orderDelegate completion:(void (^ __null_unspecified)(TradableOrder * __nullable, TradableError * __nullable))completion;
+
+/// Issues new market order with protections.
+///
+/// \param forAccount The account for which the order should be issued.
+///
+/// \param symbol The symbol for which the order should be issued.
+///
+/// \param amount The amount of the order.
+///
+/// \param side The side of the order.
+///
+/// \param takeProfitDistance An optional price distance of take profit protection.
+///
+/// \param stopLossDistance An optional price distance of stop loss protection.
+///
+/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewMarketOrderWithProtections:(TradableAccount * __nonnull)forAccount symbol:(NSString * __nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * __nullable)takeProfitDistance stopLossDistance:(TradableDistance * __nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> __nullable)orderDelegate completion:(void (^ __null_unspecified)(TradableOrder * __nullable, TradableError * __nullable))completion;
 
 /// Gets prices.
 ///
@@ -835,6 +855,11 @@ SWIFT_PROTOCOL("_TtP11TradableAPI20TradableAuthDelegate_")
 
 /// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated.
 - (void)tradableReady;
+
+/// A delegate hook for authentication error handling.
+///
+/// \param error A TradableError object that contains detailed information about the error.
+- (void)tradableAuthenticationError:(TradableError * __nonnull)error;
 @end
 
 
@@ -1007,6 +1032,22 @@ typedef SWIFT_ENUM(NSInteger, TradableDemoAccountType) {
 /// Account with stocks.
   TradableDemoAccountTypeSTOCKS = 1,
 };
+
+
+
+/// A wrapper class for order protection distance.
+SWIFT_CLASS("_TtC11TradableAPI16TradableDistance")
+@interface TradableDistance : NSObject
+
+/// The price distance of protection.
+@property (nonatomic, readonly) double distance;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithDistance:(double)distance OBJC_DESIGNATED_INITIALIZER;
+@end
 
 
 
@@ -1703,6 +1744,9 @@ typedef SWIFT_ENUM(NSInteger, TradableSingleProtection) {
 SWIFT_CLASS("_TtC11TradableAPI15TradableSymbols")
 @interface TradableSymbols : NSObject
 
+/// A constant that can be passed into symbols array for getting price updates for portfolio's symbols.
++ (NSString * __nonnull)ALL_OPEN_POSITIONS;
+
 /// A list of symbols.
 @property (nonatomic, copy) NSArray<NSString *> * __nonnull symbols;
 
@@ -1752,7 +1796,7 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateFrequency) {
 /// Update type for managed mode.
 typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 
-/// Updates for account snapshot, orders, positions and prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
+/// Updates for account snapshot, orders, positions and prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to get prices for portfolio's symbols.
   TradableUpdateTypeFull = 0,
 
 /// Updates just for account positions.
@@ -1761,9 +1805,26 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 /// Updates just for account orders.
   TradableUpdateTypeOrders = 2,
 
-/// Updates just for tick prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
+/// Updates just for tick prices. A list of symbols for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to get prices for portfolio's symbols.
   TradableUpdateTypePrices = 3,
 };
+
+
+
+/// A helper class providing methods for easy price/pip conversion and more.
+SWIFT_CLASS("_TtC11TradableAPI17TradableUtilities")
+@interface TradableUtilities : NSObject
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+/// An enumeration for utility class errors.
+typedef SWIFT_ENUM(NSInteger, TradableUtilitiesError) {
+
+/// Unsupported instrument error.
+  TradableUtilitiesErrorUnsupportedInstrument = 0,
+};
+static NSString * const TradableUtilitiesErrorDomain = @"TradableAPI.TradableUtilitiesError";
 
 
 @interface UIView (SWIFT_EXTENSION(TradableAPI))

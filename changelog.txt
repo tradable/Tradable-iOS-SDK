@@ -1,3 +1,13 @@
+v1.12
+
+- Added a method for issuing market order with protections and order status delegate.
+- Added an optional method for error handling to auth delegate.
+- Added TradableUtilities helper class for easy pip/price conversion and more.
+- Added TradableSymbols.ALL_OPEN_POSITIONS constant for getting price updates for portfolio’s symbols.
+- Implemented the logic for auto-refreshing tokens for demo accounts.
+- Improved managed mode handling when app becomes inactive.
+
+
 v1.11
 
 - Added an initializer to TradableCandleRequest that takes NSDate as from and to params.
