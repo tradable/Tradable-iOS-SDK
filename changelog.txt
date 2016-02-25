@@ -1,3 +1,9 @@
+v1.13
+
+- Fixed a bug that caused a crash when resuming an app using the SDK from locked screen.
+- Improved the OAuth flow token persistence.
+
+
 v1.12
 
 - Added a method for issuing market order with protections and order status delegate.
