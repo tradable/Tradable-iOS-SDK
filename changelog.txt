@@ -1,3 +1,10 @@
+v1.14
+
+- Added includeMarginFactors property to TradableSymbols.
+- Added marginBands optional property to TradablePrice.
+- Added a method for calculating an estimated margin requirement.
+
+
 v1.13
 
 - Fixed a bug that caused a crash when resuming an app using the SDK from locked screen.

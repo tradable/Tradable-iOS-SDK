@@ -439,6 +439,7 @@ enum TradableOrderSide : NSInteger;
 @class TradableInstrument;
 @class TradablePositions;
 @class TradableOrders;
+@class TradableMarginBands;
 @protocol TradableOrderEntryDelegate;
 @class UIViewController;
 @protocol TradableInstrumentSelectorDelegate;
@@ -826,6 +827,13 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param searchPhrase The phrase that the instruments will be searched for.
 - (void)searchForInstruments:(TradableAccount * __nonnull)forAccount searchPhrase:(NSString * __nonnull)searchPhrase;
+
+/// Calculates the estimated margin requirement for given quantity and margin bands.
+///
+/// \param marginBands The margin bands to calculate margin estimation for. Should come from TradablePrice.
+///
+/// \param quantity The quantity of an order to calculate margin estimation for.
+- (double)calculateRequiredMarginEstimate:(TradableMarginBands * __nonnull)marginBands quantity:(double)quantity;
 
 /// Presents Order Entry widget.
 ///
@@ -1672,6 +1680,36 @@ SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
 
 
 
+/// The margin factor for volumes in this margin band.
+SWIFT_CLASS("_TtC11TradableAPI18TradableMarginBand")
+@interface TradableMarginBand : NSObject
+
+/// The lowest amount for this margin band.
+@property (nonatomic, readonly) double lowerBound;
+
+/// The margin factor, multiply this by the volume to get the margin requirement. This is only an estimate of the margin requirement, the trading system may require a different margin.
+@property (nonatomic, readonly) double marginFactor;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+@end
+
+
+
+/// A collection of margin factors for an instrument, can be used to estimate the margin requirement before placing an order.
+SWIFT_CLASS("_TtC11TradableAPI19TradableMarginBands")
+@interface TradableMarginBands : NSObject
+
+/// A list of margin bands.
+@property (nonatomic, copy) NSArray<TradableMarginBand *> * __nonnull marginBands;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
 /// Tradable OS user. Might have a couple of accounts assigned to it.
 SWIFT_CLASS("_TtC11TradableAPI14TradableOSUser")
 @interface TradableOSUser : NSObject
@@ -1957,6 +1995,9 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 /// The current value of one pip for one unit of this symbol converted to the account currency. If the instrument doesn't have pip precision this field contains the change in account currency when the price of the instrument moves one unit (1.0).
 @property (nonatomic, readonly) double pipValue;
 
+/// Optional object that may be included when 'includeMarginFactors' is true. Contains information that can be used to estimate margin requirement before placing an order. Not all trading systems expose their instrument leverage so this field may not be present for all brokers.
+@property (nonatomic, readonly, strong) TradableMarginBands * __nullable marginBands;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 @end
@@ -2054,15 +2095,20 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableSymbols")
 /// A list of symbols.
 @property (nonatomic, copy) NSArray<NSString *> * __nonnull symbols;
 
+/// If this is true, each price object will contain a Margin Bands object. Defaults to false.
+@property (nonatomic) BOOL includeMarginFactors;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
 
-/// A convenience initializer that creates TradableSymbols object with a list of symbols.
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * __nonnull)symbols includeMarginFactors:(BOOL)includeMarginFactors OBJC_DESIGNATED_INITIALIZER;
+
+/// A convenience initializer that creates TradableSymbols object with a list of symbols. Sets includeMarginFactors to false.
 - (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * __nonnull)symbols;
 
 /// A builder pattern method that allows to append a symbol to this object's list of symbols.
 - (TradableSymbols * __nonnull)withSymbol:(NSString * __nonnull)symbol;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
