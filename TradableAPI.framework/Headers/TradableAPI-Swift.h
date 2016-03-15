@@ -409,6 +409,7 @@ enum TradableDemoAccountType : NSInteger;
 @class UIWebView;
 @class TradableAccessToken;
 @class TradableAccount;
+@class TradableLastSessionCloseRequest;
 @class TradableLastSessionClose;
 @class TradableError;
 @class TradableAPIAuthenticationRequest;
@@ -504,14 +505,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// Returns the current access token (may be nil).
 - (TradableAccessToken * __nullable)getCurrentAccessToken;
 
-/// Gets the last session's close price for given symbols.
+/// Gets the last session's close price for given symbols and timestamp.
 ///
-/// \param forAccount The account for which the prices should be retrieved.
+/// \param forAccount The account for which the last session close prices should be retrieved.
 ///
-/// \param symbols The list symbol for which the close prices should be retrieved.
+/// \param lastSessionCloseRequest The request to be made.
 ///
 /// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
-- (void)getLastSessionClose:(TradableAccount * __nonnull)forAccount symbols:(NSArray<NSString *> * __nonnull)symbols completion:(void (^ __null_unspecified)(NSArray<TradableLastSessionClose *> * __nullable, TradableError * __nullable))completion;
+- (void)getLastSessionClose:(TradableAccount * __nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * __nonnull)lastSessionCloseRequest completion:(void (^ __null_unspecified)(NSArray<TradableLastSessionClose *> * __nullable, TradableError * __nullable))completion;
 
 /// Provides a token granting access to the account(s) associated with the given login.
 ///
@@ -1676,6 +1677,22 @@ SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * __nonnull description;
+@end
+
+
+
+/// A request class used for getting last session's close.
+SWIFT_CLASS("_TtC11TradableAPI31TradableLastSessionCloseRequest")
+@interface TradableLastSessionCloseRequest : NSObject
+
+/// The list of symbols for which the close prices should be retrieved.
+@property (nonatomic, readonly, copy) NSArray<NSString *> * __nonnull symbols;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * __nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * __nonnull)symbols OBJC_DESIGNATED_INITIALIZER;
 @end
 
 

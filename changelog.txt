@@ -1,3 +1,8 @@
+v1.15
+
+- Modified getLastSessionClose method to retrieve a close price of a session prior to a timestamp specified.
+
+
 v1.14
 
 - Added includeMarginFactors property to TradableSymbols.
