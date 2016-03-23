@@ -1,3 +1,9 @@
+v1.16
+
+- Compiled the SDK with Swift 2.2 compiler (using Xcode 7.3).
+- Added a method for getting session-grouped candles for the past x sessions.
+
+
 v1.15
 
 - Modified getLastSessionClose method to retrieve a close price of a session prior to a timestamp specified.
