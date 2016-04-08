@@ -30,4 +30,79 @@ Steps to use the API:
     return true
   }
   </pre>
-4. Listen for <i>tradableReady()</i> auth delegate method call. The API is ready to be used!
+4. Listen for <i>tradableReady(forAccount: TradableAccount)</i> auth delegate method call. The API is ready to be used!
+
+
+<br />
+Handling multiple updates:
+
+Should you be in need to show data across user's accounts, you can invoke 'startUpdates(...)' method for as many accounts as you wish. The TradableEventDelegate's callbacks come back with objects such as e.g. TradableAccountSnapshot which contain 'forAccount' field of type TradableAccount. This way you know what account you have received an update for.
+<br />
+Consider the following example:
+
+<pre>
+import UIKit
+
+import TradableAPI
+
+class ViewController: UIViewController, TradableAuthDelegate, TradableEventsDelegate {
+
+    var accounts:[TradableAccount] = []
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        Tradable.sharedInstance.authDelegate = self
+        Tradable.sharedInstance.delegate = self
+
+        for _ in 0..<3 {
+            Tradable.sharedInstance.createDemoAccount(TradableDemoAPIAuthenticationRequest(appId: 100007, type: TradableDemoAccountType.STOCKS), completion: { (accessToken, error) in
+                if let accessToken = accessToken {
+                    Tradable.sharedInstance.activateAfterLaunchWithAccessToken(accessToken)
+                }
+            })
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    func tradableReady(forAccount: TradableAccount) {
+        print("Tradable ready for account id = \(forAccount.uniqueId)")
+        
+        var i = 0
+        for account in accounts {
+            if account.uniqueId == forAccount.uniqueId {
+                break
+            }
+            i += 1
+        }
+        if i == accounts.count {
+            print("Account with id = \(forAccount.uniqueId) has been added.")
+            accounts.append(forAccount)
+            
+            Tradable.sharedInstance.startUpdates(forAccount, updateType: TradableUpdateType.Full, frequency: TradableUpdateFrequency.ThreeSeconds, symbols: TradableSymbols(symbols: [TradableSymbols.ALL_OPEN_POSITIONS]))
+            print("Started updates for account id = \(forAccount.uniqueId).")
+        }
+    }
+    
+    func tradableAuthenticationError(error: TradableError) {
+        print(error)
+    }
+
+    func tradableAccountMetricsUpdated(metrics: TradableAccountMetrics) {
+        print("Received metrics for account id = \(metrics.forAccount.uniqueId).")
+        
+        for account in accounts {
+            if account.uniqueId == metrics.forAccount.uniqueId {
+                print("Equity = \(metrics.equity)")
+            }
+        }
+    }
+    
+    func tradableUpdateError(error: TradableError) {
+        print(error)
+    }
+}
+</pre>
