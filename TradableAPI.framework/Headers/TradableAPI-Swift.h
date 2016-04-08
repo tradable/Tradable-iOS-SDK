@@ -114,15 +114,15 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 @property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
 @end
 
+
+@interface NSURLRequest (SWIFT_EXTENSION(TradableAPI))
+@property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
+@end
+
 @class NSMutableURLRequest;
 
 @interface NSURLRequest (SWIFT_EXTENSION(TradableAPI))
 @property (nonatomic, readonly, strong) NSMutableURLRequest * _Nonnull URLRequest;
-@end
-
-
-@interface NSURLRequest (SWIFT_EXTENSION(TradableAPI))
-@property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
 @end
 
 
@@ -432,13 +432,13 @@ SWIFT_CLASS("_TtCC11TradableAPI7Manager15SessionDelegate")
 enum TradableDemoAccountType : NSInteger;
 @class UIWebView;
 @class TradableAccessToken;
+@class TradableAPIAuthenticationRequest;
+@class TradableError;
+@class TradableDemoAPIAuthenticationRequest;
+@class TradableAPIRefreshAuthenticationRequest;
 @class TradableAccount;
 @class TradableLastSessionCloseRequest;
 @class TradableLastSessionClose;
-@class TradableError;
-@class TradableAPIAuthenticationRequest;
-@class TradableDemoAPIAuthenticationRequest;
-@class TradableAPIRefreshAuthenticationRequest;
 @class TradableBroker;
 @class TradableApp;
 enum TradableUpdateType : NSInteger;
@@ -462,6 +462,10 @@ enum TradableOrderSide : NSInteger;
 @class TradableIndicatorInfo;
 @class TradableOSUser;
 @class TradableInstrument;
+@class TradableSymbolList;
+@class TradableInstrumentList;
+@class TradableInstrumentSearchQuery;
+@class TradableInstrumentSearchResult;
 @class TradablePositions;
 @class TradableOrders;
 @class TradableMarginBands;
@@ -493,14 +497,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// A singleton object used to invoke API methods on.
 + (Tradable * _Nonnull)sharedInstance;
 
-/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known token, if fails, falls back to creating a demo account. If the current token exists and is not expired, it uses the current token for the session. Otherwise tries to restore previous session's token and use it for the current session. If that token is expired, tries to refresh it and use the refreshed token; if it doesn't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
+/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
 ///
 /// \param appId Client ID.
 ///
 /// \param accountType The account type to be used or created (stocks or forex).
 - (void)activateOrCreateDemoAccount:(uint64_t)appId accountType:(enum TradableDemoAccountType)accountType;
 
-/// A method used to create and/or activate LIVE accounts. Tries to activate Tradable SDK with the last known token, if fails, falls back to authentication flow. If the current token exists and is not expired, it uses the current token for the session. Otherwise tries to restore previous session's token and use it for the current session. If that token is expired or doesn't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
+/// A method used to create and/or activate LIVE accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to authentication flow. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired or don't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
 ///
 /// \param appId OAuth flow client ID.
 ///
@@ -523,22 +527,10 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param url URL containing information needed in order to create access token.
 - (void)activateAfterLaunchWithURL:(NSURL * _Nonnull)url;
 
-/// Tells the API to activate with an access token. When the activation is successful, tradableReady auth delegate method is called.
+/// Tells the API to activate with an access token. When the activation is successful, tradableReady auth delegate method is called; if activation fails, tradableAuthenticationError auth delegate method is called.
 ///
 /// \param accessToken The access token to activate the API with.
 - (void)activateAfterLaunchWithAccessToken:(TradableAccessToken * _Nonnull)accessToken;
-
-/// Returns the current access token (may be nil).
-- (TradableAccessToken * _Nullable)getCurrentAccessToken;
-
-/// Gets the last session's close price for given symbols and timestamp.
-///
-/// \param forAccount The account for which the last session close prices should be retrieved.
-///
-/// \param lastSessionCloseRequest The request to be made.
-///
-/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
-- (void)getLastSessionClose:(TradableAccount * _Nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completion:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable, TradableError * _Nullable))completion;
 
 /// Provides a token granting access to the account(s) associated with the given login.
 ///
@@ -561,6 +553,21 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableAccessToken object and optional TradableError object.
 - (void)refreshAuthentication:(TradableAPIRefreshAuthenticationRequest * _Nonnull)refreshAuthRequest completion:(void (^ _Null_unspecified)(TradableAccessToken * _Nullable, TradableError * _Nullable))completion;
 
+/// Returns the access token for specified account (may be nil).
+- (TradableAccessToken * _Nullable)getAccessToken:(TradableAccount * _Nonnull)forAccount;
+
+/// Returns an account's unique ID to token dictionary consisting of the last session's access tokens, if such were stored; nil otherwise.
+- (NSDictionary<NSString *, TradableAccessToken *> * _Nullable)getLastSessionAccessTokens;
+
+/// Gets the last session's close price for given symbols and timestamp.
+///
+/// \param forAccount The account for which the last session close prices should be retrieved.
+///
+/// \param lastSessionCloseRequest The request to be made.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
+- (void)getLastSessionClose:(TradableAccount * _Nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completion:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable, TradableError * _Nullable))completion;
+
 /// Gets the list of available brokers.
 ///
 /// \param completion The closure to be called when the response comes back, with optional list of TradableBroker objects and optional TradableError object.
@@ -573,7 +580,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableApp object and optional TradableError object.
 - (void)getAppInfo:(uint64_t)clientId completion:(void (^ _Null_unspecified)(TradableApp * _Nullable, TradableError * _Nullable))completion;
 
-/// Starts updates for specified account after stopping previous updates.
+/// Starts updates for specified account after stopping previous updates for this account.
 ///
 /// \param forAccount The account for which the updates should be started.
 ///
@@ -584,13 +591,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param symbols An optional list of symbols for which the updates should be started. Should be specified for full updates and price updates. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to symbols array to get prices for portfolio's symbols.
 - (void)startUpdates:(TradableAccount * _Nonnull)forAccount updateType:(enum TradableUpdateType)updateType frequency:(enum TradableUpdateFrequency)frequency symbols:(TradableSymbols * _Nullable)symbols;
 
-/// Set symbols for updates.
+/// Set symbols for updates for specified account.
 ///
+/// <ul><li>forAccount:          The account for which the symbols should be used.</li></ul>
 /// \param symbols The symbols that should be used in updates. Replaces the previous list of symbols that was in use. May be set before or after starting the updates.
-- (void)setSymbolsForUpdates:(TradableSymbols * _Nonnull)symbols;
+- (void)setSymbolsForUpdates:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols;
 
-/// Stops updates and clears symbol list.
-- (void)stopUpdates;
+/// Stops updates for specified account and clears symbol list.
+- (void)stopUpdates:(TradableAccount * _Nonnull)forAccount;
 
 /// Starts candle updates for specified account after stopping previous updates.
 ///
@@ -771,8 +779,10 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// Gets available accounts.
 ///
+/// \param accessToken The access token to be used when calling the API.
+///
 /// \param completion The closure to be called when the response comes back, with optional TradableAccountList object and optional TradableError object.
-- (void)getAvailableAccounts:(void (^ _Null_unspecified)(TradableAccountList * _Nullable, TradableError * _Nullable))completion;
+- (void)getAvailableAccounts:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableAccountList * _Nullable, TradableError * _Nullable))completion;
 
 /// Gets the indicators information.
 ///
@@ -783,15 +793,35 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// Gets the current OS user.
 ///
+/// \param accessToken The access token to be used when calling the API.
+///
 /// \param completion The closure to be called when the response comes back, with optional TradableOSUser object and optional TradableError object.
-- (void)getCurrentUser:(void (^ _Null_unspecified)(TradableOSUser * _Nullable, TradableError * _Nullable))completion;
+- (void)getCurrentUser:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableOSUser * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets instruments.
+/// Gets instruments available for specified account. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
 ///
 /// \param forAccount The account for which the instruments should be fetched.
 ///
 /// \param completion The closure to be called when the response comes back, with optional array of TradableInstrument objects and optional TradableError object.
 - (void)getInstruments:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableInstrument *> * _Nullable, TradableError * _Nullable))completion;
+
+/// Gets instruments by specifying a list of symbols. Should be used if account's instrumentRetrieval param equals .SEARCH_2_CHARACTERS_MINIMUM.
+///
+/// \param forAccount The account for which the instruments should be fetched.
+///
+/// \param symbolList The TradableSymbolList object containing symbols for which the instruments should be retrieved.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableInstrumentList object and optional TradableError object.
+- (void)getInstruments:(TradableAccount * _Nonnull)forAccount symbolList:(TradableSymbolList * _Nonnull)symbolList completion:(void (^ _Null_unspecified)(TradableInstrumentList * _Nullable, TradableError * _Nullable))completion;
+
+/// Performs an instrument search for given query. If getInstruments(forAccount:symbolList:completion) does not return any instruments, you have to use this method to search for the instruments.
+///
+/// \param forAccount The account for which the instrument search should be performed.
+///
+/// \param instrumentSearchQuery The TradableInstrumentSearchQuery object containing search query.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableInstrumentSearchResult object and optional TradableError object.
+- (void)instrumentSearch:(TradableAccount * _Nonnull)forAccount instrumentSearchQuery:(TradableInstrumentSearchQuery * _Nonnull)instrumentSearchQuery completion:(void (^ _Null_unspecified)(TradableInstrumentSearchResult * _Nullable, TradableError * _Nullable))completion;
 
 /// Gets position by ID.
 ///
@@ -839,7 +869,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional array of TradableOrder objects and optional TradableError object.
 - (void)getPendingOrders:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableOrder *> * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets instrument by specifying symbol and account.
+/// Gets instrument by specifying symbol and account. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
 ///
 /// \param forAccount The account for which the instrument will be retrieved.
 ///
@@ -848,7 +878,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableInstrument object and optional TradableError object.
 - (void)getInstrumentBySymbol:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol completion:(void (^ _Null_unspecified)(TradableInstrument * _Nullable, TradableError * _Nullable))completion;
 
-/// Searches for instruments that contain a specified phrase. Returns the results using current searchDelegate's tradableInstrumentsFound method.
+/// Searches for instruments that contain a specified phrase. Returns the results using current searchDelegate's tradableInstrumentsFound method. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
 ///
 /// \param forAccount The account for which the instruments will be searched for.
 ///
@@ -864,7 +894,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// Returns candles grouped into open market sessions.
 ///
-/// <ul><li>candleAggregation:       The candle aggregation.</li><li>sessions:                The number of sessions to retrieve. Must be greater than 0.</li><li>completion:              he closure to be called when the response comes back, with optional dictionary of Int to list of TradableCandle objects and optional TradableError object.</li></ul>
+/// <ul><li>candleAggregation:       The candle aggregation.</li><li>sessions:                The number of sessions to retrieve. Must be greater than 0.</li><li>completion:              The closure to be called when the response comes back, with optional dictionary of UInt to list of TradableCandle objects and optional TradableError object.</li></ul>
 /// \param forAccount The account for which the candles should be retrieved.
 ///
 /// \param symbol The symbol for which the candles should be retrieved.
@@ -1002,6 +1032,9 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithToken:(NSString * _Nonnull)token endpointURL:(NSString * _Nonnull)endpointURL expirationDate:(NSDate * _Nonnull)expirationDate OBJC_DESIGNATED_INITIALIZER;
 
+/// Returns the list of accounts for which this token is used.
+- (NSArray<TradableAccount *> * _Nonnull)getAccounts;
+
 /// Removes the token from the keychain. If it's an active token, nulls the SDK's access token for the session.
 - (void)dispose;
 
@@ -1015,11 +1048,12 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 @class TradableBrokerLogos;
 enum TradableTrackConfiguration : NSInteger;
 @class TradableOrderSupport;
+enum TradableInstrumentRetrieval : NSInteger;
 
 
 /// An account used for trading.
 SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
-@interface TradableAccount : NSObject
+@interface TradableAccount : NSObject <NSCoding>
 
 /// A unique identifier for the account.
 @property (nonatomic, readonly, copy) NSString * _Nonnull uniqueId;
@@ -1072,8 +1106,17 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// Specifies the capabilities of stop orders on this account.
 @property (nonatomic, readonly, strong) TradableOrderSupport * _Nonnull stopOrdersSupport;
 
+/// Specifies how instruments are retrieved for this account.
+@property (nonatomic, readonly) enum TradableInstrumentRetrieval instrumentRetrieval;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * _Nonnull)coder;
 @end
 
 
@@ -1083,11 +1126,10 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccountList")
 @interface TradableAccountList : NSObject
 
 /// A list of available accounts.
-@property (nonatomic, copy) NSArray<TradableAccount *> * _Nonnull accounts;
+@property (nonatomic, readonly, copy) NSArray<TradableAccount *> * _Nonnull accounts;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1095,6 +1137,9 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccountList")
 /// The users balance and other account metrics. All amounts are in account currency.
 SWIFT_CLASS("_TtC11TradableAPI22TradableAccountMetrics")
 @interface TradableAccountMetrics : NSObject
+
+/// The account these metrics belong to.
+@property (nonatomic, readonly, strong) TradableAccount * _Nonnull forAccount;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -1187,11 +1232,6 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 ///
 /// \param logoCompleted A closure containing an optional app icon.
 - (void)getIcon:(void (^ _Null_unspecified)(UIImage * _Nullable))logoCompleted;
-
-/// Fetches app image and caches it.
-///
-/// \param logoCompleted A closure containing an optional app image.
-- (void)getImage:(void (^ _Null_unspecified)(UIImage * _Nullable))logoCompleted;
 @end
 
 
@@ -1201,8 +1241,8 @@ SWIFT_PROTOCOL("_TtP11TradableAPI20TradableAuthDelegate_")
 @protocol TradableAuthDelegate
 @optional
 
-/// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated.
-- (void)tradableReady;
+/// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated for specified account.
+- (void)tradableReady:(TradableAccount * _Nonnull)forAccount;
 
 /// A delegate hook for authentication error handling.
 ///
@@ -1236,7 +1276,7 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableBroker")
 
 /// Contains a set of various broker logos for specific account.
 SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
-@interface TradableBrokerLogos : NSObject
+@interface TradableBrokerLogos : NSObject <NSCoding>
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -1265,6 +1305,12 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
 ///
 /// \param logoCompleted A closure containing an optional broker solid logo in SVG format for this account.
 - (void)getSvgSolidBrokerLogo:(void (^ _Null_unspecified)(UIImage * _Nullable))logoCompleted;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * _Nonnull)coder;
 @end
 
 
@@ -1346,9 +1392,11 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 /// A list of indicators.
 @property (nonatomic, copy) NSArray<TradableIndicator *> * _Nonnull indicators;
 
+/// The account these candles belong to.
+@property (nonatomic, readonly, strong) TradableAccount * _Nonnull forAccount;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1425,6 +1473,9 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableError")
 
 /// The type of the error.
 @property (nonatomic, readonly) enum TradableErrorType errorType;
+
+/// The account this error regards. Might be nil.
+@property (nonatomic, readonly, strong) TradableAccount * _Nullable forAccount;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -1666,6 +1717,62 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 
 
 
+/// Contains a list of instruments.
+SWIFT_CLASS("_TtC11TradableAPI22TradableInstrumentList")
+@interface TradableInstrumentList : NSObject
+
+/// A list of instruments.
+@property (nonatomic, readonly, copy) NSArray<TradableInstrument *> * _Nonnull instruments;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+/// Possible options for account's instruments retrieval.
+typedef SWIFT_ENUM(NSInteger, TradableInstrumentRetrieval) {
+
+/// Specifies that 'GET /instruments' should be used to get a complete list of account instruments.
+  TradableInstrumentRetrievalFULL_INSTRUMENT_LIST = 0,
+
+/// Specifies that 'POST /instrumentSearch' should be used to search for instruments, and information about the instruments can be retrieved using 'POST /instruments'
+  TradableInstrumentRetrievalSEARCH_2_CHARACTERS_MINIMUM = 1,
+};
+
+
+
+/// Ues the query to perform a remote search with the broker. This should only be used if the account doesn't return all the instruments in the GET /instruments call.
+SWIFT_CLASS("_TtC11TradableAPI29TradableInstrumentSearchQuery")
+@interface TradableInstrumentSearchQuery : NSObject
+
+/// The query used in an instrument search.
+@property (nonatomic, readonly, copy) NSString * _Nonnull query;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithQuery:(NSString * _Nonnull)query OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+
+/// The result of an instrument search.
+SWIFT_CLASS("_TtC11TradableAPI30TradableInstrumentSearchResult")
+@interface TradableInstrumentSearchResult : NSObject
+
+/// The symbol names returned by the search.
+@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull symbols;
+
+/// he maximum number of results were returned, this means that some matches may not be displayed, and that you should refine the search in order to see them.
+@property (nonatomic, readonly) BOOL moreResultsAvailable;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+
 /// The delegate protocol for the Instrument Selector widget.
 SWIFT_PROTOCOL("_TtP11TradableAPI34TradableInstrumentSelectorDelegate_")
 @protocol TradableInstrumentSelectorDelegate
@@ -1692,6 +1799,9 @@ typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
 
 /// American depositary receipt.
   TradableInstrumentTypeADR = 4,
+
+/// Spread bet.
+  TradableInstrumentTypeSPREAD_BET = 5,
 };
 
 
@@ -1752,11 +1862,10 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableMarginBands")
 @interface TradableMarginBands : NSObject
 
 /// A list of margin bands.
-@property (nonatomic, copy) NSArray<TradableMarginBand *> * _Nonnull marginBands;
+@property (nonatomic, readonly, copy) NSArray<TradableMarginBand *> * _Nonnull marginBands;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1930,7 +2039,7 @@ SWIFT_PROTOCOL("_TtP11TradableAPI27TradableOrderStatusDelegate_")
 
 /// A definition of the capabilities of an order type.
 SWIFT_CLASS("_TtC11TradableAPI20TradableOrderSupport")
-@interface TradableOrderSupport : NSObject
+@interface TradableOrderSupport : NSObject <NSCoding>
 
 /// Specifies if the order type supports attached take profit distance.
 @property (nonatomic, readonly) BOOL takeProfit;
@@ -1940,6 +2049,12 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderSupport")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * _Nonnull)coder;
 @end
 
 
@@ -1971,9 +2086,11 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOrders")
 /// A list of recently executed orders.
 @property (nonatomic, copy) NSArray<TradableOrder *> * _Nonnull recentlyExecuted;
 
+/// The account these orders belong to.
+@property (nonatomic, readonly, strong) TradableAccount * _Nonnull forAccount;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -2024,14 +2141,16 @@ SWIFT_CLASS("_TtC11TradableAPI17TradablePositions")
 @interface TradablePositions : NSObject
 
 /// A list of open positions.
-@property (nonatomic, copy) NSArray<TradablePosition *> * _Nonnull open;
+@property (nonatomic, readonly, copy) NSArray<TradablePosition *> * _Nonnull open;
 
 /// A list of recently closed positions.
-@property (nonatomic, copy) NSArray<TradablePosition *> * _Nonnull recentlyClosed;
+@property (nonatomic, readonly, copy) NSArray<TradablePosition *> * _Nonnull recentlyClosed;
+
+/// The account these positions belong to.
+@property (nonatomic, readonly, strong) TradableAccount * _Nonnull forAccount;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -2061,6 +2180,9 @@ SWIFT_CLASS("_TtC11TradableAPI14TradablePrices")
 
 /// A dictionary of symbols to TradablePrice objects.
 @property (nonatomic, readonly, copy) NSDictionary<NSString *, TradablePrice *> * _Nonnull prices;
+
+/// The account these prices belong to.
+@property (nonatomic, readonly, strong) TradableAccount * _Nonnull forAccount;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -2133,6 +2255,22 @@ typedef SWIFT_ENUM(NSInteger, TradableSingleProtection) {
 /// Stop loss protection.
   TradableSingleProtectionSTOPLOSS = 1,
 };
+
+
+
+/// Contains a list of symbols.
+SWIFT_CLASS("_TtC11TradableAPI18TradableSymbolList")
+@interface TradableSymbolList : NSObject
+
+/// The list of symbols for which to get detailed instrument information.
+@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull symbols;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * _Nonnull)symbols OBJC_DESIGNATED_INITIALIZER;
+@end
 
 
 

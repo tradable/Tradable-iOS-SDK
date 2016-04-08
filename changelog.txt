@@ -1,3 +1,14 @@
+v1.17
+
+- Revised authorization/authentication methods.
+- BREAKING CHANGE: TradableAuthDelegate’s tradableReady method has been changed to return TradableAccount object.
+- Added support for updates for multiple accounts.
+- BREAKING CHANGE: Methods stopUpdates and setSymbolsForUpdates have been changed to require forAccount param of type TradableAccount.
+- Added instrumentRetrieval property to TradableAccount.
+- Added a method for instrument searching for accounts that do not support full instrument list retrieval.
+- Added new instrument type to TradableInstrumentType enum: SPREAD_BET.
+
+
 v1.16
 
 - Compiled the SDK with Swift 2.2 compiler (using Xcode 7.3).

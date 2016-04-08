@@ -6,11 +6,11 @@
 	<dict>
 		<key>Assets.car</key>
 		<data>
-		aBAxPQivVAlkQ8KnTqhG0WqKRWY=
+		7S5CE+P3xGGU5xAhFWCixU8RJ4c=
 		</data>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<data>
-		FfVMHJyadIEz4RDdu2w0hhq+zFA=
+		3ecji9tFxWMM6jy85q30I1p5oc0=
 		</data>
 		<key>Headers/TradableAPI.h</key>
 		<data>
@@ -22,19 +22,19 @@
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftdoc</key>
 		<data>
-		g9u9SqEAOiVvvKh7z02QZQayeYI=
+		7jbHu/VDwKi579j5rIF5XqsuHww=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<data>
-		/uXnT0pS+AVzQeZeNAXBMYa+QRM=
+		xvexTI6b8JnIPZQucALhPSbHkEY=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<data>
-		XG8CdkR2n1QiZo1YvBJGxOzMWt8=
+		3UuvHL8OZF5HFchVbSW3DEVlG/I=
 		</data>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<data>
-		md2r1IE5oEm7HFADqQBiYWVmu0s=
+		DIb4KIvcmGS/KYzuPicmEtuj0I4=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -46,39 +46,39 @@
 		</data>
 		<key>Widgets.storyboardc/AOs-Lz-tDt-view-kF4-RF-Hq1.nib</key>
 		<data>
-		Wo1e6foH6c7luElzG+ToGzwXp3U=
+		GbfL2eZI9ijbbM1WSTanEUf018Y=
 		</data>
 		<key>Widgets.storyboardc/Info.plist</key>
 		<data>
-		SepT2tPIMCLIMY63zZLYYbE1wEI=
+		uo2xxJE3HPdna38w657scm8pVso=
 		</data>
 		<key>Widgets.storyboardc/Ofe-Mb-3Wk-view-WHb-jN-al6.nib</key>
 		<data>
-		4gSdHzW5jn24kXdI29GYrch0Pco=
+		bZ01LEO8jOzPnZMZI0U381wvEo0=
 		</data>
 		<key>Widgets.storyboardc/P3i-77-Cyi-view-rqr-I2-tNf.nib</key>
 		<data>
-		smyGEpr0LHj3dl5ePzGtY/7V/O4=
+		vvXp45fSlVlBmyKf4N8h2px/524=
 		</data>
 		<key>Widgets.storyboardc/editOrder.nib</key>
 		<data>
-		D8EYwqRKsXN+0DQt1rgQlXF6Gwk=
+		1oaTakZeUigqaHcEP1onUAgPNHI=
 		</data>
 		<key>Widgets.storyboardc/instrumentSelector.nib</key>
 		<data>
-		oU8/aBnrUXwHnZHR6pbAQ7Si9YE=
+		1kIFD5UlGFp0HMK7djoG8NVbNoA=
 		</data>
 		<key>Widgets.storyboardc/orderEntry.nib</key>
 		<data>
-		ih/3VjgjvjE0cDqGQVUDiOHUZMk=
+		itp2JI8pP9bmFn/QtKygqxW5Dng=
 		</data>
 		<key>Widgets.storyboardc/positionDetail.nib</key>
 		<data>
-		l2dvuibx3fC5IuWTnMUwL4b8Z2I=
+		qyD6i5abyTmCObpbMhtJzh2SygU=
 		</data>
 		<key>Widgets.storyboardc/ui3-jR-1Wt-view-GcZ-RC-kXm.nib</key>
 		<data>
-		ptuhsgGD//la/YjQ5+BkeEHL05c=
+		BS/I1whk3GKv5gs/cWwqfhcEJxc=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -87,22 +87,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			aBAxPQivVAlkQ8KnTqhG0WqKRWY=
+			7S5CE+P3xGGU5xAhFWCixU8RJ4c=
 			</data>
 			<key>hash2</key>
 			<data>
-			/MAV9z+cuKUkG1INYM8iYrFHjYzRlag+oeuExKAnxJU=
+			LZDcPkt6GncTCLZufaaxEfnDDuYBZXN5ChLqsjiRqN0=
 			</data>
 		</dict>
 		<key>Headers/TradableAPI-Swift.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			FfVMHJyadIEz4RDdu2w0hhq+zFA=
+			3ecji9tFxWMM6jy85q30I1p5oc0=
 			</data>
 			<key>hash2</key>
 			<data>
-			4RsNKZ7C9tB8+z1IGfyUCYfbjw9BT1Hw9EXYMGrbAgA=
+			YYu+suBWY1z8sRrUFXjV6j4LJmXbFFiBE+7QDdKuFyM=
 			</data>
 		</dict>
 		<key>Headers/TradableAPI.h</key>
@@ -120,44 +120,44 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			g9u9SqEAOiVvvKh7z02QZQayeYI=
+			7jbHu/VDwKi579j5rIF5XqsuHww=
 			</data>
 			<key>hash2</key>
 			<data>
-			nTY5yP5pGQMQB7Z1RYkA7e9CLiGKmZ1GSW0SwHgIt/U=
+			iA+WpJgHHiXNYrTtzTmvxmURd1upCk8LpcYM06+PFKs=
 			</data>
 		</dict>
 		<key>Modules/TradableAPI.swiftmodule/arm.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			/uXnT0pS+AVzQeZeNAXBMYa+QRM=
+			xvexTI6b8JnIPZQucALhPSbHkEY=
 			</data>
 			<key>hash2</key>
 			<data>
-			HCE5GZ3jBSfi4iKnzI92Jl7lqATo/g8hmf+caShDHxA=
+			h7y+QvAYJNsby2xGJy60Rms8VP/j2xwPiJ7uENHqlNE=
 			</data>
 		</dict>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			XG8CdkR2n1QiZo1YvBJGxOzMWt8=
+			3UuvHL8OZF5HFchVbSW3DEVlG/I=
 			</data>
 			<key>hash2</key>
 			<data>
-			VTWSf8V7vMZjvABd8hIJ9hzA/Fw8svjHDIXkRDPy6qM=
+			GGpkC2hTClx1QbOzxBhHUEo4rT5uTpUFRG2e8AhvTj4=
 			</data>
 		</dict>
 		<key>Modules/TradableAPI.swiftmodule/arm64.swiftmodule</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			md2r1IE5oEm7HFADqQBiYWVmu0s=
+			DIb4KIvcmGS/KYzuPicmEtuj0I4=
 			</data>
 			<key>hash2</key>
 			<data>
-			t9UXHg7vYW13VdcJteVd2WI/tZ9hZsHXf8Xbzrb6qwQ=
+			odsCI+r08xh3WQaLn1Kyg2fjGstbXUe7DRo+aUtU+Nc=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -186,99 +186,99 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Wo1e6foH6c7luElzG+ToGzwXp3U=
+			GbfL2eZI9ijbbM1WSTanEUf018Y=
 			</data>
 			<key>hash2</key>
 			<data>
-			5vurVNmuNt7b0E1mwO6Hfqu/LBtHlZXOe4LmBC7eP8I=
+			1IOKNyBBL3jicNX3LAvdZgBuOCIW04yGCPRkJmUfYtI=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			SepT2tPIMCLIMY63zZLYYbE1wEI=
+			uo2xxJE3HPdna38w657scm8pVso=
 			</data>
 			<key>hash2</key>
 			<data>
-			/ZMQPMnx1VadBtEP+o9AP8G+0Lje56YKvRXN38DpDaM=
+			cjL9V9eLtDTqk5+TrFmpi8p83E5WstY9Nl6er3qkmQA=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/Ofe-Mb-3Wk-view-WHb-jN-al6.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			4gSdHzW5jn24kXdI29GYrch0Pco=
+			bZ01LEO8jOzPnZMZI0U381wvEo0=
 			</data>
 			<key>hash2</key>
 			<data>
-			P0htAPfgye9OX5990VMlYEi60xk0sdPaIlpLoax4ZAE=
+			v3g5meUB119RcUH/qf2BebZI+fW6t8wAaar8OMD44Qo=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/P3i-77-Cyi-view-rqr-I2-tNf.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			smyGEpr0LHj3dl5ePzGtY/7V/O4=
+			vvXp45fSlVlBmyKf4N8h2px/524=
 			</data>
 			<key>hash2</key>
 			<data>
-			Op9ACbjGjZoLpmcw/PHSsTLWWvIkFW/U3wH9PFYR8j0=
+			3OS3h61CmEV0EBlGpLi4pA8vOjuPNl3ix+5gZOnEJLo=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/editOrder.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			D8EYwqRKsXN+0DQt1rgQlXF6Gwk=
+			1oaTakZeUigqaHcEP1onUAgPNHI=
 			</data>
 			<key>hash2</key>
 			<data>
-			yVoNoRqOQxZX2xoGESH08rhhYT4YGAGOW7SqqFkjwEU=
+			dR7Q6JsDt73u9FAFIpquIikzOt6NOwCC7g2/7MFniaU=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/instrumentSelector.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			oU8/aBnrUXwHnZHR6pbAQ7Si9YE=
+			1kIFD5UlGFp0HMK7djoG8NVbNoA=
 			</data>
 			<key>hash2</key>
 			<data>
-			X7UR6H+ziE+55vn+RLi2zyKDDEmYyBC/p48Bn/wNhxc=
+			AUtuOYN9mxAQMKRS4Pe+xJePsmfTjYnTTziob6J9JU8=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/orderEntry.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			ih/3VjgjvjE0cDqGQVUDiOHUZMk=
+			itp2JI8pP9bmFn/QtKygqxW5Dng=
 			</data>
 			<key>hash2</key>
 			<data>
-			o6KYk0GUAzbnrp5+ejxtPBGHWm+Zz+F3hXN8kW45aik=
+			UofPQNyY9JnEcm0SmYKtZ81GIzrghHF+d2wdmitEMUQ=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/positionDetail.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			l2dvuibx3fC5IuWTnMUwL4b8Z2I=
+			qyD6i5abyTmCObpbMhtJzh2SygU=
 			</data>
 			<key>hash2</key>
 			<data>
-			lmP1nxvk1o8Jp4gQQmLkdsuLhWJT2QbiM0oHSJ07+Fc=
+			BX7KYP0htLSMwuRu/QIESqGXlEi9L6cpKMNsgD7kEHY=
 			</data>
 		</dict>
 		<key>Widgets.storyboardc/ui3-jR-1Wt-view-GcZ-RC-kXm.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			ptuhsgGD//la/YjQ5+BkeEHL05c=
+			BS/I1whk3GKv5gs/cWwqfhcEJxc=
 			</data>
 			<key>hash2</key>
 			<data>
-			M9uNrJN3+6dvztyY6Qatw1zaxnvYr2cLGnHrtbZCucU=
+			AW/cS5dKJHH+9SywVilRkIUuSnnvNMWWj0N8ei+O260=
 			</data>
 		</dict>
 	</dict>
