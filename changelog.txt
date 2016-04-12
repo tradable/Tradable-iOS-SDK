@@ -1,3 +1,11 @@
+v1.18
+
+- Added support for candle updates for multiple accounts.
+- BREAKING CHANGE: Changed method stopCandleUpdates to require forAccount param of type TradableAccount.
+- Added an optional tradableDeactivated method to TradableAuthDelegate.
+- Added a call to TradableAuthDelegate’s tradableAuthenticationError method when a request sent to the API returns with invalid/expired token error.
+
+
 v1.17
 
 - Revised authorization/authentication methods.

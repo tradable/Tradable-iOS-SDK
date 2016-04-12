@@ -497,14 +497,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// A singleton object used to invoke API methods on.
 + (Tradable * _Nonnull)sharedInstance;
 
-/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
+/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
 ///
 /// \param appId Client ID.
 ///
 /// \param accountType The account type to be used or created (stocks or forex).
 - (void)activateOrCreateDemoAccount:(uint64_t)appId accountType:(enum TradableDemoAccountType)accountType;
 
-/// A method used to create and/or activate LIVE accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to authentication flow. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired or don't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI.
+/// A method used to create and/or activate LIVE accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to authentication flow. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired or don't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
 ///
 /// \param appId OAuth flow client ID.
 ///
@@ -600,7 +600,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// Stops updates for specified account and clears symbol list.
 - (void)stopUpdates:(TradableAccount * _Nonnull)forAccount;
 
-/// Starts candle updates for specified account after stopping previous updates.
+/// Starts candle updates for specified account after stopping previous updates for this account.
 ///
 /// \param forAccount The account for which the updates should be started.
 ///
@@ -611,8 +611,10 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param from Unix timestamp in milliseconds, specifies since when should the candles be requested. Cannot be greater than the current timestamp.
 - (void)startCandleUpdates:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol aggregation:(NSInteger)aggregation from:(uint64_t)from;
 
-/// Stops candle updates.
-- (void)stopCandleUpdates;
+/// Stops candle updates for specified account.
+///
+/// \param forAccount The account for which the updates should be stopped.
+- (void)stopCandleUpdates:(TradableAccount * _Nonnull)forAccount;
 
 /// Cancels protections.
 ///
@@ -1243,6 +1245,9 @@ SWIFT_PROTOCOL("_TtP11TradableAPI20TradableAuthDelegate_")
 
 /// A delegate hook for knowing when the API methods are ready to be used. Called when the access token has been updated for specified account.
 - (void)tradableReady:(TradableAccount * _Nonnull)forAccount;
+
+/// A delegate hook for knowing when the SDK has been deactivated and trading has been disabled. Called when the SDK has gone from an active state to inactive state (by removing all access tokens).
+- (void)tradableDeactivated;
 
 /// A delegate hook for authentication error handling.
 ///
