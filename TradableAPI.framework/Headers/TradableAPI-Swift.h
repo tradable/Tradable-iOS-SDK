@@ -437,10 +437,11 @@ enum TradableDemoAccountType : NSInteger;
 @class TradableDemoAPIAuthenticationRequest;
 @class TradableAPIRefreshAuthenticationRequest;
 @class TradableAccount;
-@class TradableLastSessionCloseRequest;
-@class TradableLastSessionClose;
 @class TradableBroker;
 @class TradableApp;
+@class TradableOSUser;
+@class TradableAccountList;
+@class TradableIndicatorInfo;
 enum TradableUpdateType : NSInteger;
 enum TradableUpdateFrequency : NSInteger;
 @class TradableSymbols;
@@ -454,13 +455,10 @@ enum TradableSingleProtection : NSInteger;
 enum TradableOrderSide : NSInteger;
 @protocol TradableOrderStatusDelegate;
 @class TradableDistance;
-@class TradablePrices;
 @class TradableCandleRequest;
 @class TradableCandles;
 @class TradableAccountSnapshot;
-@class TradableAccountList;
-@class TradableIndicatorInfo;
-@class TradableOSUser;
+@class TradablePrices;
 @class TradableInstrument;
 @class TradableSymbolList;
 @class TradableInstrumentList;
@@ -469,6 +467,8 @@ enum TradableOrderSide : NSInteger;
 @class TradablePositions;
 @class TradableOrders;
 @class TradableMarginBands;
+@class TradableLastSessionCloseRequest;
+@class TradableLastSessionClose;
 enum TradableAggregation : NSInteger;
 @class TradableCandle;
 @protocol TradableOrderEntryDelegate;
@@ -553,20 +553,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableAccessToken object and optional TradableError object.
 - (void)refreshAuthentication:(TradableAPIRefreshAuthenticationRequest * _Nonnull)refreshAuthRequest completion:(void (^ _Null_unspecified)(TradableAccessToken * _Nullable, TradableError * _Nullable))completion;
 
+/// Returns a list of active accounts.
+- (NSArray<TradableAccount *> * _Nonnull)getActiveAccounts;
+
 /// Returns the access token for specified account (may be nil).
 - (TradableAccessToken * _Nullable)getAccessToken:(TradableAccount * _Nonnull)forAccount;
 
 /// Returns an account's unique ID to token dictionary consisting of the last session's access tokens, if such were stored; nil otherwise.
 - (NSDictionary<NSString *, TradableAccessToken *> * _Nullable)getLastSessionAccessTokens;
-
-/// Gets the last session's close price for given symbols and timestamp.
-///
-/// \param forAccount The account for which the last session close prices should be retrieved.
-///
-/// \param lastSessionCloseRequest The request to be made.
-///
-/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
-- (void)getLastSessionClose:(TradableAccount * _Nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completion:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable, TradableError * _Nullable))completion;
 
 /// Gets the list of available brokers.
 ///
@@ -580,6 +574,27 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableApp object and optional TradableError object.
 - (void)getAppInfo:(uint64_t)clientId completion:(void (^ _Null_unspecified)(TradableApp * _Nullable, TradableError * _Nullable))completion;
 
+/// Gets the current OS user.
+///
+/// \param accessToken The access token to be used when calling the API.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableOSUser object and optional TradableError object.
+- (void)getCurrentUser:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableOSUser * _Nullable, TradableError * _Nullable))completion;
+
+/// Gets available accounts.
+///
+/// \param accessToken The access token to be used when calling the API.
+///
+/// \param completion The closure to be called when the response comes back, with optional TradableAccountList object and optional TradableError object.
+- (void)getAvailableAccounts:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableAccountList * _Nullable, TradableError * _Nullable))completion;
+
+/// Gets the indicators information.
+///
+/// \param forAccount The account for which the indicators info should be fetched.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableIndicatorInfo objects and optional TradableError object.
+- (void)getIndicatorsInfo:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableIndicatorInfo *> * _Nullable, TradableError * _Nullable))completion;
+
 /// Starts updates for specified account after stopping previous updates for this account.
 ///
 /// \param forAccount The account for which the updates should be started.
@@ -591,7 +606,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param symbols An optional list of symbols for which the updates should be started. Should be specified for full updates and price updates. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to symbols array to get prices for portfolio's symbols.
 - (void)startUpdates:(TradableAccount * _Nonnull)forAccount updateType:(enum TradableUpdateType)updateType frequency:(enum TradableUpdateFrequency)frequency symbols:(TradableSymbols * _Nullable)symbols;
 
-/// Set symbols for updates for specified account.
+/// Sets symbols for updates for specified account.
 ///
 /// <ul><li>forAccount:          The account for which the symbols should be used.</li></ul>
 /// \param symbols The symbols that should be used in updates. Replaces the previous list of symbols that was in use. May be set before or after starting the updates.
@@ -643,7 +658,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)closeAllPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Closes position.
+/// Closes a position.
 ///
 /// \param forAccount The account for which the position should be closed.
 ///
@@ -652,7 +667,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)closePosition:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Cancels order.
+/// Cancels an order.
 ///
 /// \param forAccount The account for which the order should be cancelled.
 ///
@@ -661,7 +676,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)cancelOrder:(TradableAccount * _Nonnull)forAccount forOrder:(TradableOrder * _Nonnull)forOrder completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Adds or modifies single protection.
+/// Adds or modifies a single protection.
 ///
 /// \param forAccount The account for which the protection should be added or modified.
 ///
@@ -685,7 +700,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)modifyProtections:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition protection:(TradableProtection * _Nonnull)protection completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Reduces position size to specified amount.
+/// Reduces a position size to the specified amount.
 ///
 /// \param forAccount The account for which the position size should be reduced.
 ///
@@ -696,7 +711,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)reducePositionSize:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition newAmount:(TradableAmount * _Nonnull)newAmount completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Modifies order.
+/// Modifies an order.
 ///
 /// \param forAccount The account for which the order should be modified.
 ///
@@ -707,7 +722,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableError object.
 - (void)modifyOrder:(TradableAccount * _Nonnull)forAccount forOrder:(TradableOrder * _Nonnull)forOrder orderModification:(TradableOrderModification * _Nonnull)orderModification completion:(void (^ _Null_unspecified)(TradableError * _Nullable))completion;
 
-/// Issues new order.
+/// Issues a new order.
 ///
 /// \param forAccount The account for which the order should be issued.
 ///
@@ -716,7 +731,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewOrder:(TradableAccount * _Nonnull)forAccount orderCommand:(TradableOrderCommand * _Nonnull)orderCommand completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completion;
 
-/// Issues new market order.
+/// Issues a new market order.
 ///
 /// \param forAccount The account for which the order should be issued.
 ///
@@ -731,7 +746,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewMarketOrder:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completion;
 
-/// Issues new market order with protections.
+/// Issues a new market order with protections.
 ///
 /// \param forAccount The account for which the order should be issued.
 ///
@@ -750,15 +765,6 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewMarketOrderWithProtections:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * _Nullable)takeProfitDistance stopLossDistance:(TradableDistance * _Nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets prices.
-///
-/// \param forAccount The account for which the prices should be fetched.
-///
-/// \param symbols The symbols for which the prices should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional array of TradablePrice objects and optional TradableError object.
-- (void)getPrices:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols completion:(void (^ _Null_unspecified)(TradablePrices * _Nullable, TradableError * _Nullable))completion;
-
 /// Gets candles.\Remark 
 ///
 /// This method is recursive.
@@ -770,7 +776,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableCandles object and optional TradableError object.
 - (void)getCandles:(TradableAccount * _Nonnull)forAccount candleRequest:(TradableCandleRequest * _Nonnull)candleRequest completion:(void (^ _Null_unspecified)(TradableCandles * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets a snapshot of the account.
+/// Gets a snapshot of specified account.
 ///
 /// \param forAccount The account for which the snapshot should be fetched.
 ///
@@ -779,26 +785,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableAccountSnapshot object and optional TradableError object.
 - (void)getAccountSnapshot:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols completion:(void (^ _Null_unspecified)(TradableAccountSnapshot * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets available accounts.
+/// Gets prices.
 ///
-/// \param accessToken The access token to be used when calling the API.
+/// \param forAccount The account for which the prices should be fetched.
 ///
-/// \param completion The closure to be called when the response comes back, with optional TradableAccountList object and optional TradableError object.
-- (void)getAvailableAccounts:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableAccountList * _Nullable, TradableError * _Nullable))completion;
-
-/// Gets the indicators information.
+/// \param symbols The symbols for which the prices should be fetched.
 ///
-/// \param forAccount The account for which the indicators info should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional list of TradableIndicatorInfo objects and optional TradableError object.
-- (void)getIndicatorsInfo:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableIndicatorInfo *> * _Nullable, TradableError * _Nullable))completion;
-
-/// Gets the current OS user.
-///
-/// \param accessToken The access token to be used when calling the API.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOSUser object and optional TradableError object.
-- (void)getCurrentUser:(TradableAccessToken * _Nonnull)accessToken completion:(void (^ _Null_unspecified)(TradableOSUser * _Nullable, TradableError * _Nullable))completion;
+/// \param completion The closure to be called when the response comes back, with optional array of TradablePrice objects and optional TradableError object.
+- (void)getPrices:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols completion:(void (^ _Null_unspecified)(TradablePrices * _Nullable, TradableError * _Nullable))completion;
 
 /// Gets instruments available for specified account. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
 ///
@@ -825,7 +819,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradableInstrumentSearchResult object and optional TradableError object.
 - (void)instrumentSearch:(TradableAccount * _Nonnull)forAccount instrumentSearchQuery:(TradableInstrumentSearchQuery * _Nonnull)instrumentSearchQuery completion:(void (^ _Null_unspecified)(TradableInstrumentSearchResult * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets position by ID.
+/// Gets a position by ID.
 ///
 /// \param forAccount The account for which the position should be fetched.
 ///
@@ -841,14 +835,14 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional TradablePositions object and optional TradableError object.
 - (void)getPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(TradablePositions * _Nullable, TradableError * _Nullable))completion;
 
-/// Get open positions.
+/// Gets open positions.
 ///
 /// \param forAccount The account for which the open positions should be fetched.
 ///
 /// \param completion The closure to be called when the response comes back, with optional array of TradablePosition objects and optional TradableError object.
 - (void)getOpenPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradablePosition *> * _Nullable, TradableError * _Nullable))completion;
 
-/// Gets order by ID.
+/// Gets an order by ID.
 ///
 /// \param forAccount The account for which the order should be fetched.
 ///
@@ -894,12 +888,26 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param quantity The quantity of an order to calculate margin estimation for.
 - (double)calculateRequiredMarginEstimate:(TradableMarginBands * _Nonnull)marginBands quantity:(double)quantity;
 
+/// Gets the last session's close price for given symbols and timestamp.
+///
+/// \param forAccount The account for which the last session close prices should be retrieved.
+///
+/// \param lastSessionCloseRequest The request to be made.
+///
+/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
+- (void)getLastSessionClose:(TradableAccount * _Nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completion:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable, TradableError * _Nullable))completion;
+
 /// Returns candles grouped into open market sessions.
 ///
-/// <ul><li>candleAggregation:       The candle aggregation.</li><li>sessions:                The number of sessions to retrieve. Must be greater than 0.</li><li>completion:              The closure to be called when the response comes back, with optional dictionary of UInt to list of TradableCandle objects and optional TradableError object.</li></ul>
 /// \param forAccount The account for which the candles should be retrieved.
 ///
 /// \param symbol The symbol for which the candles should be retrieved.
+///
+/// \param candleAggregation The candle aggregation.
+///
+/// \param sessions The number of sessions to retrieve. Must be greater than 0.
+///
+/// \param completion The closure to be called when the response comes back, with optional dictionary of UInt to list of TradableCandle objects and optional TradableError object.
 - (void)getGroupedCandles:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol candleAggregation:(enum TradableAggregation)candleAggregation sessions:(NSInteger)sessions completion:(void (^ _Null_unspecified)(NSDictionary<NSNumber *, NSArray<TradableCandle *> *> * _Nullable, TradableError * _Nullable))completion;
 
 /// Presents Order Entry widget.
@@ -1051,6 +1059,8 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 enum TradableTrackConfiguration : NSInteger;
 @class TradableOrderSupport;
 enum TradableInstrumentRetrieval : NSInteger;
+@class TradableUpdateRequest;
+@class TradableAccountMetrics;
 
 
 /// An account used for trading.
@@ -1113,6 +1123,150 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Starts updates for this account for all open positions; stops previous updates for this account, if such were in action.
+///
+/// \param type The type of the updates.
+///
+/// \param frequency The frequency of the updates.
+- (void)startUpdatesWithType:(enum TradableUpdateType)type frequency:(enum TradableUpdateFrequency)frequency;
+
+/// Stops updates for this account.
+- (void)stopUpdates;
+
+/// Sets update request for updates for this account. The request containing instrument IDs may be set before or after starting the updates.
+///
+/// \param request The request that should be used for updates. Replaces the previous request that was in use for this account.
+- (void)setRequestForUpdates:(TradableUpdateRequest * _Nonnull)request;
+
+/// Starts candle updates for this account; stops previous candle updates for this account, if such were in action.
+///
+/// \param instrument The instrument for which the updates should be started.
+///
+/// \param aggregation The aggregation (in minutes) for which the updates should be started.
+///
+/// \param from A Unix timestamp in milliseconds, specifies since when should the candles be requested. Cannot be greater than the current timestamp.
+- (void)startCandleUpdatesForInstrument:(TradableInstrument * _Nonnull)instrument aggregation:(NSInteger)aggregation from:(uint64_t)from;
+
+/// Stops candle updates for this account.
+- (void)stopCandleUpdates;
+
+/// Gets a snapshot of this account.
+///
+/// \param updateRequest The request that should be used to fetch the snapshot.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableAccountSnapshot object and an optional TradableError object.
+- (void)getAccountSnapshotWithRequest:(TradableUpdateRequest * _Nonnull)updateRequest completionHandler:(void (^ _Null_unspecified)(TradableAccountSnapshot * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets prices for this account.
+///
+/// \param updateRequest The request that should be used to fetch the prices.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional array of TradablePrice objects and an optional TradableError object.
+- (void)getPricesWithRequest:(TradableUpdateRequest * _Nonnull)updateRequest completionHandler:(void (^ _Null_unspecified)(TradablePrices * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets this account's metrics.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional array of TradableMetrics objects and an optional TradableError object.
+- (void)getAccountMetrics:(void (^ _Null_unspecified)(TradableAccountMetrics * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets all orders for this account.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrders object and an optional TradableError object.
+- (void)getOrders:(void (^ _Null_unspecified)(TradableOrders * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets pending orders for this account.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional list of TradableOrder objects and an optional TradableError object.
+- (void)getPendingOrders:(void (^ _Null_unspecified)(NSArray<TradableOrder *> * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets an order by ID for this account.
+///
+/// \param id The ID of the order that should be fetched.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object.
+- (void)getOrderById:(NSString * _Nonnull)id completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Issues a new order.
+///
+/// \param orderCommand The order command object, containing information about the order that should be issued.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewOrderWithOrderCommand:(TradableOrderCommand * _Nonnull)orderCommand completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Issues a new market order.
+///
+/// \param instrument The instrument for which the order should be issued.
+///
+/// \param amount The amount of the order.
+///
+/// \param side The side of the order.
+///
+/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewMarketOrderForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Issues a new market order with protections.
+///
+/// \param instrument The instrument for which the order should be issued.
+///
+/// \param amount The amount of the order.
+///
+/// \param side The side of the order.
+///
+/// \param takeProfitDistance An optional price distance of take profit protection.
+///
+/// \param stopLossDistance An optional price distance of stop loss protection.
+///
+/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewMarketOrderWithProtectionsForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * _Nullable)takeProfitDistance stopLossDistance:(TradableDistance * _Nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets all positions for this account.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradablePositions object and an optional TradableError object.
+- (void)getPositions:(void (^ _Null_unspecified)(TradablePositions * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets open positions for this account.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional list of TradablePosition objects and an optional TradableError object.
+- (void)getOpenPositions:(void (^ _Null_unspecified)(NSArray<TradablePosition *> * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets a position by ID for this account.
+///
+/// \param id The ID of the position that should be fetched.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradablePosition object and an optional TradableError object.
+- (void)getPositionById:(NSString * _Nonnull)id completionHandler:(void (^ _Null_unspecified)(TradablePosition * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets candles.\Remark 
+///
+/// This method is recursive.
+///
+/// \param candleRequest The candle request object containing information about the candles that should be fetched.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableCandles object and an optional TradableError object.
+- (void)getCandlesWithRequest:(TradableCandleRequest * _Nonnull)candleRequest completionHandler:(void (^ _Null_unspecified)(TradableCandles * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Returns candles grouped into open market sessions.
+///
+/// \param instrument The instrument for which the candles should be retrieved.
+///
+/// \param aggregation The candle aggregation.
+///
+/// \param sessions The number of sessions to retrieve. Must be greater than 0.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional dictionary of UInt to list of TradableCandle objects and an optional TradableError object.
+- (void)getGroupedCandlesForInstrument:(TradableInstrument * _Nonnull)instrument aggregation:(enum TradableAggregation)aggregation sessions:(NSInteger)sessions completionHandler:(void (^ _Null_unspecified)(NSDictionary<NSNumber *, NSArray<TradableCandle *> *> * _Nullable, TradableError * _Nullable))completionHandler;
+
+/// Gets the last session's close.
+///
+/// \param lastSessionCloseRequest The request to be made.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional list of TradableLastSessionClose objects and an optional TradableError object.
+- (void)getLastSessionCloseWithRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completionHandler:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable, TradableError * _Nullable))completionHandler;
 
 /// Creates an object with given parameters. Conforms to NSCoding protocol.
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)decoder;
@@ -1680,6 +1834,9 @@ enum TradableInstrumentType : NSInteger;
 SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 @interface TradableInstrument : NSObject
 
+/// The unique identifier for this instrument.
+@property (nonatomic, readonly, copy) NSString * _Nonnull id;
+
 /// The symbol that is used to represent the instrument in the brokerage account.
 @property (nonatomic, readonly, copy) NSString * _Nonnull brokerageAccountSymbol;
 
@@ -1871,6 +2028,11 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableMarginBands")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Calculates the estimated margin requirement for these margin bands and given quantity.
+///
+/// \param forQuantity The quantity of an order to calculate margin estimation for.
+- (double)calculateRequiredMarginEstimateForQuantity:(double)quantity;
 @end
 
 
@@ -1937,14 +2099,24 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
+/// Modifies the order.
+///
+/// \param orderModification An order modification object containing details about modifications to be done to this order.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)modifyWithOrderModification:(TradableOrderModification * _Nonnull)orderModification completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Cancels the order.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)cancel:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
 /// Fetches the position that has been affected by this order.
 ///
-/// \param positionCompleted A closure containing the affected position.
-- (void)getAffectedPosition:(void (^ _Null_unspecified)(TradablePosition * _Nullable))positionCompleted;
+/// \param completionHandler A closure containing an optional affected position.
+- (void)getAffectedPosition:(void (^ _Null_unspecified)(TradablePosition * _Nullable))completionHandler;
 
 /// Fetches the last known order state.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object.
 - (TradableOrder * _Nonnull)getLatestState;
 @end
 
@@ -2127,6 +2299,46 @@ SWIFT_CLASS("_TtC11TradableAPI16TradablePosition")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Reduces a position size to the specified amount.
+///
+/// \param amount The amount that the position size should be reduced to.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)reduceSizeTo:(TradableAmount * _Nonnull)amount completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Closes this position.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)close:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Adds or modifies a single protection.
+///
+/// \param protectionType The type of protection that should be added or modified.
+///
+/// \param withOrderModification The order modification object containing the changes to be made to a protection.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)modifySingleProtectionOfType:(enum TradableSingleProtection)protectionType withOrderModification:(TradableOrderModification * _Nonnull)orderModification completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Cancels a single protection.
+///
+/// \param protectionType The type of protection that should be cancelled.
+///
+/// \param completionHandler A closure to be called when the response comes back, with optional TradableError object.
+- (void)cancelSingleProtectionOfType:(enum TradableSingleProtection)protectionType completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Adds or modifies protections.
+///
+/// \param protections The protection object containing the changes to be made to protections.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)modifyProtections:(TradableProtection * _Nonnull)protections completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
+
+/// Cancels protections.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)cancelProtections:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
 @end
 
 
@@ -2156,6 +2368,11 @@ SWIFT_CLASS("_TtC11TradableAPI17TradablePositions")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Closes all positions.
+///
+/// \param completionHandler The closure to be called when the response comes back, with optional TradableError object.
+- (void)closeAll:(void (^ _Null_unspecified)(TradableError * _Nullable))completionHandler;
 @end
 
 
@@ -2335,6 +2552,31 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateFrequency) {
 /// A new request is made three seconds after the response comes back.
   TradableUpdateFrequencyThreeSeconds = 3,
 };
+
+
+
+/// A request that should be sent to get prices or full account snapshot.
+SWIFT_CLASS("_TtC11TradableAPI21TradableUpdateRequest")
+@interface TradableUpdateRequest : NSObject
+
+/// A list of instrument IDs for which you want prices returned in the response.
+@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull instrumentIds;
+
+/// If this is true, response will contain prices for all instruments you have open positions in.
+@property (nonatomic, readonly) BOOL allOpenPositions;
+
+/// If this is true, each price object will contain a Margin Bands object. Defaults to false.
+@property (nonatomic, readonly) BOOL includeMarginFactors;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithInstrumentIds:(NSArray<NSString *> * _Nonnull)instrumentIds allOpenPositions:(BOOL)allOpenPositions includeMarginFactors:(BOOL)includeMarginFactors OBJC_DESIGNATED_INITIALIZER;
+
+/// A convenience initializer that creates TradableUpdateRequest object with a list of instruments.
+- (nonnull instancetype)initWithInstruments:(NSArray<TradableInstrument *> * _Nonnull)instruments allOpenPositions:(BOOL)allOpenPositions includeMarginFactors:(BOOL)includeMarginFactors;
+@end
 
 
 /// Update type for managed mode.

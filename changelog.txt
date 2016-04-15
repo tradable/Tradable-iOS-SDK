@@ -1,3 +1,9 @@
+v1.19
+
+- Deprecated some methods on Tradable instance and moved them onto TradableAccount, TradableOrder, TradablePosition, TradablePositions and TradableMarginBands.
+- Deprecated TradableSymbols and added TradableUpdateRequest which should be used instead.
+
+
 v1.18
 
 - Added support for candle updates for multiple accounts.
