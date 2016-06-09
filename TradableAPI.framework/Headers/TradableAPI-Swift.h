@@ -981,11 +981,17 @@ SWIFT_CLASS("_TtC11TradableAPI32TradableAPIAuthenticationRequest")
 /// The password for the account.
 @property (nonatomic, readonly, copy) NSString * _Nonnull password;
 
+/// Allows the caller to provide an id for the user, so it is possible to link the user identity in the caller's system with the Tradable account.
+@property (nonatomic, readonly, copy) NSString * _Nullable externalId;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password externalId:(NSString * _Nullable)externalId OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1059,8 +1065,10 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableAccessToken")
 enum TradableTrackConfiguration : NSInteger;
 @class TradableOrderSupport;
 enum TradableInstrumentRetrieval : NSInteger;
+@class TradableProtectionEntryTypes;
 @class TradableUpdateRequest;
 @class TradableAccountMetrics;
+@class TradableOrderProtection;
 @class TradableInstrumentSearchRequest;
 
 
@@ -1122,6 +1130,9 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// Specifies how instruments are retrieved for this account.
 @property (nonatomic, readonly) enum TradableInstrumentRetrieval instrumentRetrieval;
 
+/// Specifies the types of protection entry supported, if any, when placing or modifying orders with protections for this account.
+@property (nonatomic, readonly, strong) TradableProtectionEntryTypes * _Nonnull protectionEntryTypes;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
@@ -1135,7 +1146,7 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 /// Stops updates for this account.
 - (void)stopUpdates;
 
-/// Sets update request for updates for this account. The request containing instrument IDs may be set before or after starting the updates.
+/// Sets update request for updates for this account. The request containing instrument IDs must be set after starting the updates.
 ///
 /// \param request The request that should be used for updates. Replaces the previous request that was in use for this account.
 - (void)setRequestForUpdates:(TradableUpdateRequest * _Nonnull)request;
@@ -1224,6 +1235,23 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 ///
 /// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewMarketOrderWithProtectionsForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * _Nullable)takeProfitDistance stopLossDistance:(TradableDistance * _Nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completionHandler;
+
+/// Issues a new market order with protections.
+///
+/// \param instrument The instrument for which the order should be issued.
+///
+/// \param amount The amount of the order.
+///
+/// \param side The side of the order.
+///
+/// \param takeProfit An optional take profit protection.
+///
+/// \param stopLoss An optional stop loss protection.
+///
+/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
+///
+/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
+- (void)issueNewMarketOrderWithProtectionsForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side takeProfit:(TradableOrderProtection * _Nullable)takeProfit stopLoss:(TradableOrderProtection * _Nullable)stopLoss orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completionHandler;
 
 /// Gets all positions for this account.
 ///
@@ -2187,6 +2215,15 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 /// Identifier of the affected position. Might not be available.
 @property (nonatomic, readonly, copy) NSString * _Nullable affectedPositionId;
 
+/// Identifiers of the affected positions. Might not be available.
+@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nullable affectedPositionsIds;
+
+/// The take profit attached to the order. Will be nil if no take profit is attached to the order.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable takeProfit;
+
+/// The stop loss attached to the order. Will be nil if no stop loss is attached to the order.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable stopLoss;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
@@ -2206,6 +2243,11 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 ///
 /// \param completionHandler A closure containing an optional affected position.
 - (void)getAffectedPosition:(void (^ _Null_unspecified)(TradablePosition * _Nullable affectedPosition))completionHandler;
+
+/// Fetches the positions that have been affected by this order.
+///
+/// \param completionHandler A closure containing an optional list of affected positions.
+- (void)getAffectedPositions:(void (^ _Null_unspecified)(NSArray<TradablePosition *> * _Nullable affectedPositions))completionHandler;
 
 /// Fetches the last known order state.
 - (TradableOrder * _Nonnull)getLatestState;
@@ -2240,6 +2282,12 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderCommand")
 /// /Order type.
 @property (nonatomic, readonly) enum TradableOrderType type;
 
+/// The take profit attached to the order. This is only supported for some account types.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable takeProfit;
+
+/// The stop loss attached to the order. This is only supported for some account types.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable stopLoss;
+
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
@@ -2248,6 +2296,9 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderCommand")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithInstrumentId:(NSString * _Nonnull)instrumentId amount:(double)amount price:(double)price side:(enum TradableOrderSide)side type:(enum TradableOrderType)type OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithInstrumentId:(NSString * _Nonnull)instrumentId amount:(double)amount price:(double)price side:(enum TradableOrderSide)side type:(enum TradableOrderType)type takeProfit:(TradableOrderProtection * _Nullable)takeProfit stopLoss:(TradableOrderProtection * _Nullable)stopLoss OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -2274,6 +2325,20 @@ SWIFT_CLASS("_TtC11TradableAPI25TradableOrderModification")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithPrice:(double)price OBJC_DESIGNATED_INITIALIZER;
+@end
+
+enum TradableProtectionEntryType : NSInteger;
+
+
+/// A protection specified on an order.
+SWIFT_CLASS("_TtC11TradableAPI23TradableOrderProtection")
+@interface TradableOrderProtection : NSObject
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithEntryType:(enum TradableProtectionEntryType)entryType value:(double)value OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -2549,6 +2614,33 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableProtection")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithStopLoss:(double)stopLoss takeProfit:(double)takeProfit OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+/// An enumeration defining how protections on orders are entered - as a distance from the order price or as an absolute price.
+typedef SWIFT_ENUM(NSInteger, TradableProtectionEntryType) {
+
+/// The protection is entered as an absolute price.
+  TradableProtectionEntryTypeABSOLUTE = 0,
+
+/// The protection is entered as a distance from the order price.
+  TradableProtectionEntryTypeDISTANCE = 1,
+};
+
+
+
+/// Contains a list of protection entry types.
+SWIFT_CLASS("_TtC11TradableAPI28TradableProtectionEntryTypes")
+@interface TradableProtectionEntryTypes : NSObject <NSCoding>
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters. Conforms to NSCoding protocol.
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)decoder;
+
+/// Encoding method, conforming to NSCoding protocol.
+- (void)encodeWithCoder:(NSCoder * _Nonnull)coder;
 @end
 
 
