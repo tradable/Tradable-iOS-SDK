@@ -1,3 +1,8 @@
+v1.22
+
+- Fixed a problem that prevented market orders from being sent.
+- Refined instrument search.
+
 v1.21
 
 - Deprecated classes, methods and properties that deal with protections expressed as price distance. Introduced protectionEntryTypes property on TradableAccount object, which contains a list of TradableProtectionEntryType objects. When issuing an order with protections, one has to check what types of protection entries are supported: absolute price or price distance.
