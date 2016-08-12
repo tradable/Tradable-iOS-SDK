@@ -1,3 +1,8 @@
+v1.23
+
+- Added appKey property to TradableAPIAuthenticationRequest and TradableDemoAPIAuthenticationRequest.
+- Marked deprecated fields and methods as obsolete.
+
 v1.22
 
 - Fixed a problem that prevented market orders from being sent.

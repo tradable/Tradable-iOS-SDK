@@ -504,6 +504,15 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param accountType The account type to be used or created (stocks or forex).
 - (void)activateOrCreateDemoAccount:(uint64_t)appId accountType:(enum TradableDemoAccountType)accountType;
 
+/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
+///
+/// \param accountType The account type to be used or created (stocks or forex).
+///
+/// \param appId Client ID.
+///
+/// \param appKey Client key.
+- (void)activateOrCreateDemoAccountOfType:(enum TradableDemoAccountType)accountType appId:(uint64_t)appId appKey:(NSString * _Nonnull)appKey;
+
 /// A method used to create and/or activate LIVE accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to authentication flow. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired or don't exist, the method invokes the authentication flow for Tradable, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
 ///
 /// \param appId OAuth flow client ID.
@@ -969,6 +978,9 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 SWIFT_CLASS("_TtC11TradableAPI32TradableAPIAuthenticationRequest")
 @interface TradableAPIAuthenticationRequest : NSObject
 
+/// The app key for authentication.
+@property (nonatomic, readonly, copy) NSString * _Nonnull appKey;
+
 /// The id of the app that is requesting access.
 @property (nonatomic, readonly) uint64_t appId;
 
@@ -992,6 +1004,12 @@ SWIFT_CLASS("_TtC11TradableAPI32TradableAPIAuthenticationRequest")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password externalId:(NSString * _Nullable)externalId OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppKey:(NSString * _Nonnull)appKey appId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppKey:(NSString * _Nonnull)appKey appId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password externalId:(NSString * _Nullable)externalId OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
@@ -1624,6 +1642,9 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableCandles")
 SWIFT_CLASS("_TtC11TradableAPI36TradableDemoAPIAuthenticationRequest")
 @interface TradableDemoAPIAuthenticationRequest : NSObject
 
+/// The app key for authentication.
+@property (nonatomic, readonly, copy) NSString * _Nonnull appKey;
+
 /// The id of the app that is requesting access.
 @property (nonatomic, readonly) uint64_t appId;
 
@@ -1635,6 +1656,9 @@ SWIFT_CLASS("_TtC11TradableAPI36TradableDemoAPIAuthenticationRequest")
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithAppId:(uint64_t)appId type:(enum TradableDemoAccountType)type OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithAppKey:(NSString * _Nonnull)appKey appId:(uint64_t)appId type:(enum TradableDemoAccountType)type OBJC_DESIGNATED_INITIALIZER;
 @end
 
 
