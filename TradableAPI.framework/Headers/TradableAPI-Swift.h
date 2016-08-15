@@ -92,345 +92,16 @@ typedef int swift_int4  __attribute__((__ext_vector_type__(4)));
 # endif
 #endif
 #if defined(__has_feature) && __has_feature(modules)
-@import Foundation;
-@import Foundation.NSURLSession;
 @import ObjectiveC;
 @import UIKit;
+@import Foundation;
 #endif
 
 #pragma clang diagnostic ignored "-Wproperty-attribute-mismatch"
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
-
-@interface NSNumber (SWIFT_EXTENSION(TradableAPI))
-@end
-
-
-@interface NSURL (SWIFT_EXTENSION(TradableAPI))
-@property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
-@end
-
-
-@interface NSURLComponents (SWIFT_EXTENSION(TradableAPI))
-@property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
-@end
-
-@class NSMutableURLRequest;
-
-@interface NSURLRequest (SWIFT_EXTENSION(TradableAPI))
-@property (nonatomic, readonly, strong) NSMutableURLRequest * _Nonnull URLRequest;
-@end
-
-
-@interface NSURLRequest (SWIFT_EXTENSION(TradableAPI))
-@property (nonatomic, readonly, copy) NSString * _Nonnull URLString;
-@end
-
-
-@interface NSURLSession (SWIFT_EXTENSION(TradableAPI))
-@end
-
-@class NSError;
-@class NSURLAuthenticationChallenge;
-@class NSURLCredential;
-@class NSURLSessionTask;
-@class NSHTTPURLResponse;
-@class NSInputStream;
-@class NSURLSessionDataTask;
-@class NSURLResponse;
-@class NSURLSessionDownloadTask;
-@class NSData;
-@class NSCachedURLResponse;
-
-
-/// Responsible for handling all delegate callbacks for the underlying session.
-SWIFT_CLASS("_TtCC11TradableAPI7Manager15SessionDelegate")
-@interface SessionDelegate : NSObject <NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate>
-
-/// Initializes the SessionDelegate instance.
-///
-/// \returns  The new <code>SessionDelegate
-/// </code> instance.
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
-
-/// Overrides default behavior for NSURLSessionDelegate method URLSession:didBecomeInvalidWithError:.
-@property (nonatomic, copy) void (^ _Nullable sessionDidBecomeInvalidWithError)(NSURLSession * _Nonnull, NSError * _Nullable);
-
-/// Overrides all behavior for NSURLSessionDelegate method URLSession:didReceiveChallenge:completionHandler: and requires the caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable sessionDidReceiveChallengeWithCompletion)(NSURLSession * _Nonnull, NSURLAuthenticationChallenge * _Nonnull, void (^ _Nonnull)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable));
-
-/// Overrides default behavior for NSURLSessionDelegate method URLSessionDidFinishEventsForBackgroundURLSession:.
-@property (nonatomic, copy) void (^ _Nullable sessionDidFinishEventsForBackgroundURLSession)(NSURLSession * _Nonnull);
-
-/// Tells the delegate that the session has been invalidated.
-///
-/// \param session The session object that was invalidated.
-///
-/// \param error The error that caused invalidation, or nil if the invalidation was explicit.
-- (void)URLSession:(NSURLSession * _Nonnull)session didBecomeInvalidWithError:(NSError * _Nullable)error;
-
-/// Requests credentials from the delegate in response to a session-level authentication request from the remote server.
-///
-/// \param session The session containing the task that requested authentication.
-///
-/// \param challenge An object that contains the request for authentication.
-///
-/// \param completionHandler A handler that your delegate method must call providing the disposition and credential.
-- (void)URLSession:(NSURLSession * _Nonnull)session didReceiveChallenge:(NSURLAuthenticationChallenge * _Nonnull)challenge completionHandler:(void (^ _Nonnull)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
-
-/// Tells the delegate that all messages enqueued for a session have been delivered.
-///
-/// \param session The session that no longer has any outstanding requests.
-- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession * _Nonnull)session;
-
-/// Overrides default behavior for NSURLSessionTaskDelegate method URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler:.
-@property (nonatomic, copy) NSURLRequest * _Nullable (^ _Nullable taskWillPerformHTTPRedirection)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, NSHTTPURLResponse * _Nonnull, NSURLRequest * _Nonnull);
-
-/// Overrides all behavior for NSURLSessionTaskDelegate method URLSession:task:willPerformHTTPRedirection:newRequest:completionHandler: and requires the caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable taskWillPerformHTTPRedirectionWithCompletion)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, NSHTTPURLResponse * _Nonnull, NSURLRequest * _Nonnull, void (^ _Nonnull)(NSURLRequest * _Nullable));
-
-/// Overrides all behavior for NSURLSessionTaskDelegate method URLSession:task:didReceiveChallenge:completionHandler: and requires the caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable taskDidReceiveChallengeWithCompletion)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, NSURLAuthenticationChallenge * _Nonnull, void (^ _Nonnull)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable));
-
-/// Overrides default behavior for NSURLSessionTaskDelegate method URLSession:session:task:needNewBodyStream:.
-@property (nonatomic, copy) NSInputStream * _Nullable (^ _Nullable taskNeedNewBodyStream)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull);
-
-/// Overrides all behavior for NSURLSessionTaskDelegate method URLSession:session:task:needNewBodyStream: and requires the caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable taskNeedNewBodyStreamWithCompletion)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, void (^ _Nonnull)(NSInputStream * _Nullable));
-
-/// Overrides default behavior for NSURLSessionTaskDelegate method URLSession:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:.
-@property (nonatomic, copy) void (^ _Nullable taskDidSendBodyData)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, int64_t, int64_t, int64_t);
-
-/// Overrides default behavior for NSURLSessionTaskDelegate method URLSession:task:didCompleteWithError:.
-@property (nonatomic, copy) void (^ _Nullable taskDidComplete)(NSURLSession * _Nonnull, NSURLSessionTask * _Nonnull, NSError * _Nullable);
-
-/// Tells the delegate that the remote server requested an HTTP redirect.
-///
-/// \param session The session containing the task whose request resulted in a redirect.
-///
-/// \param task The task whose request resulted in a redirect.
-///
-/// \param response An object containing the server’s response to the original request.
-///
-/// \param request A URL request object filled out with the new location.
-///
-/// \param completionHandler A closure that your handler should call with either the value of the request
-/// parameter, a modified URL request object, or NULL to refuse the redirect and
-/// return the body of the redirect response.
-- (void)URLSession:(NSURLSession * _Nonnull)session task:(NSURLSessionTask * _Nonnull)task willPerformHTTPRedirection:(NSHTTPURLResponse * _Nonnull)response newRequest:(NSURLRequest * _Nonnull)request completionHandler:(void (^ _Nonnull)(NSURLRequest * _Nullable))completionHandler;
-
-/// Requests credentials from the delegate in response to an authentication request from the remote server.
-///
-/// \param session The session containing the task whose request requires authentication.
-///
-/// \param task The task whose request requires authentication.
-///
-/// \param challenge An object that contains the request for authentication.
-///
-/// \param completionHandler A handler that your delegate method must call providing the disposition and credential.
-- (void)URLSession:(NSURLSession * _Nonnull)session task:(NSURLSessionTask * _Nonnull)task didReceiveChallenge:(NSURLAuthenticationChallenge * _Nonnull)challenge completionHandler:(void (^ _Nonnull)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
-
-/// Tells the delegate when a task requires a new request body stream to send to the remote server.
-///
-/// \param session The session containing the task that needs a new body stream.
-///
-/// \param task The task that needs a new body stream.
-///
-/// \param completionHandler A completion handler that your delegate method should call with the new body stream.
-- (void)URLSession:(NSURLSession * _Nonnull)session task:(NSURLSessionTask * _Nonnull)task needNewBodyStream:(void (^ _Nonnull)(NSInputStream * _Nullable))completionHandler;
-
-/// Periodically informs the delegate of the progress of sending body content to the server.
-///
-/// \param session The session containing the data task.
-///
-/// \param task The data task.
-///
-/// \param bytesSent The number of bytes sent since the last time this delegate method was called.
-///
-/// \param totalBytesSent The total number of bytes sent so far.
-///
-/// \param totalBytesExpectedToSend The expected length of the body data.
-- (void)URLSession:(NSURLSession * _Nonnull)session task:(NSURLSessionTask * _Nonnull)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend;
-
-/// Tells the delegate that the task finished transferring data.
-///
-/// \param session The session containing the task whose request finished transferring data.
-///
-/// \param task The task whose request finished transferring data.
-///
-/// \param error If an error occurred, an error object indicating how the transfer failed, otherwise nil.
-- (void)URLSession:(NSURLSession * _Nonnull)session task:(NSURLSessionTask * _Nonnull)task didCompleteWithError:(NSError * _Nullable)error;
-
-/// Overrides default behavior for NSURLSessionDataDelegate method URLSession:dataTask:didReceiveResponse:completionHandler:.
-@property (nonatomic, copy) NSURLSessionResponseDisposition (^ _Nullable dataTaskDidReceiveResponse)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSURLResponse * _Nonnull);
-
-/// Overrides all behavior for NSURLSessionDataDelegate method URLSession:dataTask:didReceiveResponse:completionHandler: and requires caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable dataTaskDidReceiveResponseWithCompletion)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSURLResponse * _Nonnull, void (^ _Nonnull)(NSURLSessionResponseDisposition));
-
-/// Overrides default behavior for NSURLSessionDataDelegate method URLSession:dataTask:didBecomeDownloadTask:.
-@property (nonatomic, copy) void (^ _Nullable dataTaskDidBecomeDownloadTask)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSURLSessionDownloadTask * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionDataDelegate method URLSession:dataTask:didReceiveData:.
-@property (nonatomic, copy) void (^ _Nullable dataTaskDidReceiveData)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSData * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionDataDelegate method URLSession:dataTask:willCacheResponse:completionHandler:.
-@property (nonatomic, copy) NSCachedURLResponse * _Nullable (^ _Nullable dataTaskWillCacheResponse)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSCachedURLResponse * _Nonnull);
-
-/// Overrides all behavior for NSURLSessionDataDelegate method URLSession:dataTask:willCacheResponse:completionHandler: and requires caller to call the completionHandler.
-@property (nonatomic, copy) void (^ _Nullable dataTaskWillCacheResponseWithCompletion)(NSURLSession * _Nonnull, NSURLSessionDataTask * _Nonnull, NSCachedURLResponse * _Nonnull, void (^ _Nonnull)(NSCachedURLResponse * _Nullable));
-
-/// Tells the delegate that the data task received the initial reply (headers) from the server.
-///
-/// \param session The session containing the data task that received an initial reply.
-///
-/// \param dataTask The data task that received an initial reply.
-///
-/// \param response A URL response object populated with headers.
-///
-/// \param completionHandler A completion handler that your code calls to continue the transfer, passing a
-/// constant to indicate whether the transfer should continue as a data task or
-/// should become a download task.
-- (void)URLSession:(NSURLSession * _Nonnull)session dataTask:(NSURLSessionDataTask * _Nonnull)dataTask didReceiveResponse:(NSURLResponse * _Nonnull)response completionHandler:(void (^ _Nonnull)(NSURLSessionResponseDisposition))completionHandler;
-
-/// Tells the delegate that the data task was changed to a download task.
-///
-/// \param session The session containing the task that was replaced by a download task.
-///
-/// \param dataTask The data task that was replaced by a download task.
-///
-/// \param downloadTask The new download task that replaced the data task.
-- (void)URLSession:(NSURLSession * _Nonnull)session dataTask:(NSURLSessionDataTask * _Nonnull)dataTask didBecomeDownloadTask:(NSURLSessionDownloadTask * _Nonnull)downloadTask;
-
-/// Tells the delegate that the data task has received some of the expected data.
-///
-/// \param session The session containing the data task that provided data.
-///
-/// \param dataTask The data task that provided data.
-///
-/// \param data A data object containing the transferred data.
-- (void)URLSession:(NSURLSession * _Nonnull)session dataTask:(NSURLSessionDataTask * _Nonnull)dataTask didReceiveData:(NSData * _Nonnull)data;
-
-/// Asks the delegate whether the data (or upload) task should store the response in the cache.
-///
-/// \param session The session containing the data (or upload) task.
-///
-/// \param dataTask The data (or upload) task.
-///
-/// \param proposedResponse The default caching behavior. This behavior is determined based on the current
-/// caching policy and the values of certain received headers, such as the Pragma
-/// and Cache-Control headers.
-///
-/// \param completionHandler A block that your handler must call, providing either the original proposed
-/// response, a modified version of that response, or NULL to prevent caching the
-/// response. If your delegate implements this method, it must call this completion
-/// handler; otherwise, your app leaks memory.
-- (void)URLSession:(NSURLSession * _Nonnull)session dataTask:(NSURLSessionDataTask * _Nonnull)dataTask willCacheResponse:(NSCachedURLResponse * _Nonnull)proposedResponse completionHandler:(void (^ _Nonnull)(NSCachedURLResponse * _Nullable))completionHandler;
-
-/// Overrides default behavior for NSURLSessionDownloadDelegate method URLSession:downloadTask:didFinishDownloadingToURL:.
-@property (nonatomic, copy) void (^ _Nullable downloadTaskDidFinishDownloadingToURL)(NSURLSession * _Nonnull, NSURLSessionDownloadTask * _Nonnull, NSURL * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionDownloadDelegate method URLSession:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:.
-@property (nonatomic, copy) void (^ _Nullable downloadTaskDidWriteData)(NSURLSession * _Nonnull, NSURLSessionDownloadTask * _Nonnull, int64_t, int64_t, int64_t);
-
-/// Overrides default behavior for NSURLSessionDownloadDelegate method URLSession:downloadTask:didResumeAtOffset:expectedTotalBytes:.
-@property (nonatomic, copy) void (^ _Nullable downloadTaskDidResumeAtOffset)(NSURLSession * _Nonnull, NSURLSessionDownloadTask * _Nonnull, int64_t, int64_t);
-
-/// Tells the delegate that a download task has finished downloading.
-///
-/// \param session The session containing the download task that finished.
-///
-/// \param downloadTask The download task that finished.
-///
-/// \param location A file URL for the temporary file. Because the file is temporary, you must either
-/// open the file for reading or move it to a permanent location in your app’s sandbox
-/// container directory before returning from this delegate method.
-- (void)URLSession:(NSURLSession * _Nonnull)session downloadTask:(NSURLSessionDownloadTask * _Nonnull)downloadTask didFinishDownloadingToURL:(NSURL * _Nonnull)location;
-
-/// Periodically informs the delegate about the download’s progress.
-///
-/// \param session The session containing the download task.
-///
-/// \param downloadTask The download task.
-///
-/// \param bytesWritten The number of bytes transferred since the last time this delegate
-/// method was called.
-///
-/// \param totalBytesWritten The total number of bytes transferred so far.
-///
-/// \param totalBytesExpectedToWrite The expected length of the file, as provided by the Content-Length
-/// header. If this header was not provided, the value is
-/// <code>NSURLSessionTransferSizeUnknown
-/// </code>.
-- (void)URLSession:(NSURLSession * _Nonnull)session downloadTask:(NSURLSessionDownloadTask * _Nonnull)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite;
-
-/// Tells the delegate that the download task has resumed downloading.
-///
-/// \param session The session containing the download task that finished.
-///
-/// \param downloadTask The download task that resumed. See explanation in the discussion.
-///
-/// \param fileOffset If the file's cache policy or last modified date prevents reuse of the
-/// existing content, then this value is zero. Otherwise, this value is an
-/// integer representing the number of bytes on disk that do not need to be
-/// retrieved again.
-///
-/// \param expectedTotalBytes The expected length of the file, as provided by the Content-Length header.
-/// If this header was not provided, the value is NSURLSessionTransferSizeUnknown.
-- (void)URLSession:(NSURLSession * _Nonnull)session downloadTask:(NSURLSessionDownloadTask * _Nonnull)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes;
-- (BOOL)respondsToSelector:(SEL _Null_unspecified)selector;
-@end
-
-@class NSURLSessionStreamTask;
-@class NSOutputStream;
-
-@interface SessionDelegate (SWIFT_EXTENSION(TradableAPI)) <NSURLSessionStreamDelegate>
-
-/// Overrides default behavior for NSURLSessionStreamDelegate method URLSession:readClosedForStreamTask:.
-@property (nonatomic, copy) void (^ _Nullable streamTaskReadClosed)(NSURLSession * _Nonnull, NSURLSessionStreamTask * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionStreamDelegate method URLSession:writeClosedForStreamTask:.
-@property (nonatomic, copy) void (^ _Nullable streamTaskWriteClosed)(NSURLSession * _Nonnull, NSURLSessionStreamTask * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionStreamDelegate method URLSession:betterRouteDiscoveredForStreamTask:.
-@property (nonatomic, copy) void (^ _Nullable streamTaskBetterRouteDiscovered)(NSURLSession * _Nonnull, NSURLSessionStreamTask * _Nonnull);
-
-/// Overrides default behavior for NSURLSessionStreamDelegate method URLSession:streamTask:didBecomeInputStream:outputStream:.
-@property (nonatomic, copy) void (^ _Nullable streamTaskDidBecomeInputStream)(NSURLSession * _Nonnull, NSURLSessionStreamTask * _Nonnull, NSInputStream * _Nonnull, NSOutputStream * _Nonnull);
-
-/// Tells the delegate that the read side of the connection has been closed.
-///
-/// \param session The session.
-///
-/// \param streamTask The stream task.
-- (void)URLSession:(NSURLSession * _Nonnull)session readClosedForStreamTask:(NSURLSessionStreamTask * _Nonnull)streamTask;
-
-/// Tells the delegate that the write side of the connection has been closed.
-///
-/// \param session The session.
-///
-/// \param streamTask The stream task.
-- (void)URLSession:(NSURLSession * _Nonnull)session writeClosedForStreamTask:(NSURLSessionStreamTask * _Nonnull)streamTask;
-
-/// Tells the delegate that the system has determined that a better route to the host is available.
-///
-/// \param session The session.
-///
-/// \param streamTask The stream task.
-- (void)URLSession:(NSURLSession * _Nonnull)session betterRouteDiscoveredForStreamTask:(NSURLSessionStreamTask * _Nonnull)streamTask;
-
-/// Tells the delegate that the stream task has been completed and provides the unopened stream objects.
-///
-/// \param session The session.
-///
-/// \param streamTask The stream task.
-///
-/// \param inputStream The new input stream.
-///
-/// \param outputStream The new output stream.
-- (void)URLSession:(NSURLSession * _Nonnull)session streamTask:(NSURLSessionStreamTask * _Nonnull)streamTask didBecomeInputStream:(NSInputStream * _Nonnull)inputStream outputStream:(NSOutputStream * _Nonnull)outputStream;
-@end
-
 enum TradableDemoAccountType : NSInteger;
 @class UIWebView;
+@class NSURL;
 @class TradableAccessToken;
 @class TradableAPIAuthenticationRequest;
 @class TradableError;
@@ -442,39 +113,14 @@ enum TradableDemoAccountType : NSInteger;
 @class TradableOSUser;
 @class TradableAccountList;
 @class TradableIndicatorInfo;
-enum TradableUpdateType : NSInteger;
-enum TradableUpdateFrequency : NSInteger;
-@class TradableSymbols;
-@class TradablePosition;
-enum TradableSingleProtection : NSInteger;
-@class TradableOrder;
-@class TradableOrderModification;
-@class TradableProtection;
-@class TradableAmount;
-@class TradableOrderCommand;
-enum TradableOrderSide : NSInteger;
-@protocol TradableOrderStatusDelegate;
-@class TradableDistance;
-@class TradableCandleRequest;
-@class TradableCandles;
-@class TradableAccountSnapshot;
-@class TradablePrices;
 @class TradableInstrument;
-@class TradableSymbolList;
-@class TradableInstrumentList;
-@class TradableInstrumentSearchQuery;
-@class TradableInstrumentSearchResults;
-@class TradablePositions;
-@class TradableOrders;
-@class TradableMarginBands;
-@class TradableLastSessionCloseRequest;
-@class TradableLastSessionClose;
-enum TradableAggregation : NSInteger;
-@class TradableCandle;
+enum TradableOrderSide : NSInteger;
 @protocol TradableOrderEntryDelegate;
 @class UIViewController;
 @protocol TradableInstrumentSelectorDelegate;
+@class TradableOrder;
 @protocol TradableEditOrderDelegate;
+@class TradablePosition;
 @protocol TradablePositionDetailDelegate;
 @protocol TradableEventsDelegate;
 @protocol TradableAuthDelegate;
@@ -496,13 +142,6 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 
 /// A singleton object used to invoke API methods on.
 + (Tradable * _Nonnull)sharedInstance;
-
-/// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
-///
-/// \param appId Client ID.
-///
-/// \param accountType The account type to be used or created (stocks or forex).
-- (void)activateOrCreateDemoAccount:(uint64_t)appId accountType:(enum TradableDemoAccountType)accountType;
 
 /// A method used to create and/or activate DEMO accounts. Tries to activate Tradable SDK with the last known tokens; if fails, falls back to creating a demo account. If the current tokens exist and are not expired, the SDK uses the current tokens for the session. Otherwise tries to restore previous session's tokens and use them for the current session. If those tokens are expired, tries to refresh them and uses the refreshed tokens; if they don't exist, the method creates a new demo account, with params specified by the user. This is the preferred method to use and should be the first call made to TradableAPI. This method handles token refreshing, if found tokens are refreshable.
 ///
@@ -604,321 +243,6 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional list of TradableIndicatorInfo objects and optional TradableError object.
 - (void)getIndicatorsInfo:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableIndicatorInfo *> * _Nullable indicatorsInfo, TradableError * _Nullable error))completion;
 
-/// Starts updates for specified account after stopping previous updates for this account.
-///
-/// \param forAccount The account for which the updates should be started.
-///
-/// \param updateType The type of updates.
-///
-/// \param frequency The frequency of the updates.
-///
-/// \param symbols An optional list of symbols for which the updates should be started. Should be specified for full updates and price updates. TradableSymbols.ALL_OPEN_POSITIONS constant may be passed to symbols array to get prices for portfolio's symbols.
-- (void)startUpdates:(TradableAccount * _Nonnull)forAccount updateType:(enum TradableUpdateType)updateType frequency:(enum TradableUpdateFrequency)frequency symbols:(TradableSymbols * _Nullable)symbols;
-
-/// Sets symbols for updates for specified account.
-///
-/// <ul><li>forAccount:          The account for which the symbols should be used.</li></ul>
-/// \param symbols The symbols that should be used in updates. Replaces the previous list of symbols that was in use. May be set before or after starting the updates.
-- (void)setSymbolsForUpdates:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols;
-
-/// Stops updates for specified account and clears symbol list.
-- (void)stopUpdates:(TradableAccount * _Nonnull)forAccount;
-
-/// Starts candle updates for specified account after stopping previous updates for this account.
-///
-/// \param forAccount The account for which the updates should be started.
-///
-/// \param symbol The symbol for which the updates should be started.
-///
-/// \param aggregation The aggregation (in minutes) for which the updates should be started.
-///
-/// \param from Unix timestamp in milliseconds, specifies since when should the candles be requested. Cannot be greater than the current timestamp.
-- (void)startCandleUpdates:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol aggregation:(NSInteger)aggregation from:(uint64_t)from;
-
-/// Stops candle updates for specified account.
-///
-/// \param forAccount The account for which the updates should be stopped.
-- (void)stopCandleUpdates:(TradableAccount * _Nonnull)forAccount;
-
-/// Cancels protections.
-///
-/// \param forAccount The account for which the protections should be cancelled.
-///
-/// \param forPosition The position for which the protections should be cancelled.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)cancelProtections:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Cancels single protection.
-///
-/// \param forAccount The account for which the protections should be cancelled.
-///
-/// \param forPosition The position for which the protections should be cancelled.
-///
-/// \param protection The type of protection that should be cancelled.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)cancelSingleProtection:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition protection:(enum TradableSingleProtection)protection completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Closes all positions.
-///
-/// \param forAccount The account for which the positions should be closed.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)closeAllPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Closes a position.
-///
-/// \param forAccount The account for which the position should be closed.
-///
-/// \param forPosition The position that should be closed.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)closePosition:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Cancels an order.
-///
-/// \param forAccount The account for which the order should be cancelled.
-///
-/// \param forOrder The order that should be cancelled.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)cancelOrder:(TradableAccount * _Nonnull)forAccount forOrder:(TradableOrder * _Nonnull)forOrder completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Adds or modifies a single protection.
-///
-/// \param forAccount The account for which the protection should be added or modified.
-///
-/// \param forPosition The position for which the protection should be added or modified.
-///
-/// \param protection The type of protection that should be added or modified.
-///
-/// \param orderModification The order modification object containing the changes to be made to a protection.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)modifySingleProtection:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition protection:(enum TradableSingleProtection)protection orderModification:(TradableOrderModification * _Nonnull)orderModification completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Adds or modifies protections.
-///
-/// \param forAccount The account for which the protections should be added or modified.
-///
-/// \param forPosition The position for which the protections should be added or modified.
-///
-/// \param protection The protection object containing the changes to be made to protections.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)modifyProtections:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition protection:(TradableProtection * _Nonnull)protection completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Reduces a position size to the specified amount.
-///
-/// \param forAccount The account for which the position size should be reduced.
-///
-/// \param forPosition The position whose size should be reduced.
-///
-/// \param newAmount The amount that the position size should be reduced to.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)reducePositionSize:(TradableAccount * _Nonnull)forAccount forPosition:(TradablePosition * _Nonnull)forPosition newAmount:(TradableAmount * _Nonnull)newAmount completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Modifies an order.
-///
-/// \param forAccount The account for which the order should be modified.
-///
-/// \param forOrder The order that should be modified.
-///
-/// \param orderModification The order modification object containing the changes to be made to an order.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableError object.
-- (void)modifyOrder:(TradableAccount * _Nonnull)forAccount forOrder:(TradableOrder * _Nonnull)forOrder orderModification:(TradableOrderModification * _Nonnull)orderModification completion:(void (^ _Null_unspecified)(TradableError * _Nullable error))completion;
-
-/// Issues a new order.
-///
-/// \param forAccount The account for which the order should be issued.
-///
-/// \param orderCommand The order command object, containing information about the order that should be issued.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
-- (void)issueNewOrder:(TradableAccount * _Nonnull)forAccount orderCommand:(TradableOrderCommand * _Nonnull)orderCommand completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completion;
-
-/// Issues a new market order.
-///
-/// \param forAccount The account for which the order should be issued.
-///
-/// \param symbol The symbol for which the order should be issued.
-///
-/// \param amount The amount of the order.
-///
-/// \param side The side of the order.
-///
-/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
-- (void)issueNewMarketOrder:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completion;
-
-/// Issues a new market order with protections.
-///
-/// \param forAccount The account for which the order should be issued.
-///
-/// \param symbol The symbol for which the order should be issued.
-///
-/// \param amount The amount of the order.
-///
-/// \param side The side of the order.
-///
-/// \param takeProfitDistance An optional price distance of take profit protection.
-///
-/// \param stopLossDistance An optional price distance of stop loss protection.
-///
-/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
-- (void)issueNewMarketOrderWithProtections:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * _Nullable)takeProfitDistance stopLossDistance:(TradableDistance * _Nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completion;
-
-/// Gets candles.\Remark 
-///
-/// This method is recursive.
-///
-/// \param forAccount The account for which the candles should be fetched.
-///
-/// \param candleRequest The candle request object containing information about the candles that should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableCandles object and optional TradableError object.
-- (void)getCandles:(TradableAccount * _Nonnull)forAccount candleRequest:(TradableCandleRequest * _Nonnull)candleRequest completion:(void (^ _Null_unspecified)(TradableCandles * _Nullable candles, TradableError * _Nullable error))completion;
-
-/// Gets a snapshot of specified account.
-///
-/// \param forAccount The account for which the snapshot should be fetched.
-///
-/// \param symbols The symbols for which the snapshot should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableAccountSnapshot object and optional TradableError object.
-- (void)getAccountSnapshot:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols completion:(void (^ _Null_unspecified)(TradableAccountSnapshot * _Nullable snapshot, TradableError * _Nullable error))completion;
-
-/// Gets prices.
-///
-/// \param forAccount The account for which the prices should be fetched.
-///
-/// \param symbols The symbols for which the prices should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional array of TradablePrice objects and optional TradableError object.
-- (void)getPrices:(TradableAccount * _Nonnull)forAccount symbols:(TradableSymbols * _Nonnull)symbols completion:(void (^ _Null_unspecified)(TradablePrices * _Nullable prices, TradableError * _Nullable error))completion;
-
-/// Gets instruments available for specified account. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
-///
-/// \param forAccount The account for which the instruments should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional array of TradableInstrument objects and optional TradableError object.
-- (void)getInstruments:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableInstrument *> * _Nullable instruments, TradableError * _Nullable error))completion;
-
-/// Gets instruments by specifying a list of symbols. Should be used if account's instrumentRetrieval param equals .SEARCH_2_CHARACTERS_MINIMUM.
-///
-/// \param forAccount The account for which the instruments should be fetched.
-///
-/// \param symbolList The TradableSymbolList object containing symbols for which the instruments should be retrieved.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableInstrumentList object and optional TradableError object.
-- (void)getInstruments:(TradableAccount * _Nonnull)forAccount symbolList:(TradableSymbolList * _Nonnull)symbolList completion:(void (^ _Null_unspecified)(TradableInstrumentList * _Nullable instrumentList, TradableError * _Nullable error))completion;
-
-/// Performs an instrument search for given query. If getInstruments(forAccount:symbolList:completion) does not return any instruments, you have to use this method to search for the instruments.
-///
-/// \param forAccount The account for which the instrument search should be performed.
-///
-/// \param instrumentSearchQuery The TradableInstrumentSearchQuery object containing search query.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableInstrumentSearchResults object and optional TradableError object.
-- (void)instrumentSearch:(TradableAccount * _Nonnull)forAccount instrumentSearchQuery:(TradableInstrumentSearchQuery * _Nonnull)instrumentSearchQuery completion:(void (^ _Null_unspecified)(TradableInstrumentSearchResults * _Nullable instrumentSearchResults, TradableError * _Nullable error))completion;
-
-/// Gets a position by ID.
-///
-/// \param forAccount The account for which the position should be fetched.
-///
-/// \param positionId The ID of the position that should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradablePosition object and optional TradableError object.
-- (void)getPosition:(TradableAccount * _Nonnull)forAccount positionId:(NSString * _Nonnull)positionId completion:(void (^ _Null_unspecified)(TradablePosition * _Nullable position, TradableError * _Nullable error))completion;
-
-/// Gets all positions.
-///
-/// \param forAccount The account for which the positions should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradablePositions object and optional TradableError object.
-- (void)getPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(TradablePositions * _Nullable positions, TradableError * _Nullable error))completion;
-
-/// Gets open positions.
-///
-/// \param forAccount The account for which the open positions should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional array of TradablePosition objects and optional TradableError object.
-- (void)getOpenPositions:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradablePosition *> * _Nullable openPositions, TradableError * _Nullable error))completion;
-
-/// Gets an order by ID.
-///
-/// \param forAccount The account for which the order should be fetched.
-///
-/// \param orderId The ID of the order that should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrder object and optional TradableError object.
-- (void)getOrder:(TradableAccount * _Nonnull)forAccount orderId:(NSString * _Nonnull)orderId completion:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completion;
-
-/// Gets all orders.
-///
-/// \param forAccount The account for which the orders should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableOrders object and optional TradableError object.
-- (void)getOrders:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(TradableOrders * _Nullable orders, TradableError * _Nullable error))completion;
-
-/// Gets pending orders.
-///
-/// \param forAccount The account for which the pending orders should be fetched.
-///
-/// \param completion The closure to be called when the response comes back, with optional array of TradableOrder objects and optional TradableError object.
-- (void)getPendingOrders:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableOrder *> * _Nullable pendingOrders, TradableError * _Nullable error))completion;
-
-/// Gets instrument by specifying symbol and account. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
-///
-/// \param forAccount The account for which the instrument will be retrieved.
-///
-/// \param symbol The symbol under which the instrument is to be found.
-///
-/// \param completion The closure to be called when the response comes back, with optional TradableInstrument object and optional TradableError object.
-- (void)getInstrumentBySymbol:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol completion:(void (^ _Null_unspecified)(TradableInstrument * _Nullable instrument, TradableError * _Nullable error))completion;
-
-/// Searches for instruments that contain a specified phrase. Returns the results using current searchDelegate's tradableInstrumentsFound method. Should only be used if account's instrumentRetrieval param equals .FULL_INSTRUMENT_LIST.
-///
-/// \param forAccount The account for which the instruments will be searched for.
-///
-/// \param searchPhrase The phrase that the instruments will be searched for.
-- (void)searchForInstruments:(TradableAccount * _Nonnull)forAccount searchPhrase:(NSString * _Nonnull)searchPhrase;
-
-/// Calculates the estimated margin requirement for given quantity and margin bands.
-///
-/// \param marginBands The margin bands to calculate margin estimation for. Should come from TradablePrice.
-///
-/// \param quantity The quantity of an order to calculate margin estimation for.
-- (double)calculateRequiredMarginEstimate:(TradableMarginBands * _Nonnull)marginBands quantity:(double)quantity;
-
-/// Gets the last session's close price for given symbols and timestamp.
-///
-/// \param forAccount The account for which the last session close prices should be retrieved.
-///
-/// \param lastSessionCloseRequest The request to be made.
-///
-/// \param completion The closure to be called when the response comes back, with optional list of TradableLastSessionClose objects and optional TradableError object.
-- (void)getLastSessionClose:(TradableAccount * _Nonnull)forAccount lastSessionCloseRequest:(TradableLastSessionCloseRequest * _Nonnull)lastSessionCloseRequest completion:(void (^ _Null_unspecified)(NSArray<TradableLastSessionClose *> * _Nullable lastSessionClose, TradableError * _Nullable error))completion;
-
-/// Returns candles grouped into open market sessions.
-///
-/// \param forAccount The account for which the candles should be retrieved.
-///
-/// \param symbol The symbol for which the candles should be retrieved.
-///
-/// \param candleAggregation The candle aggregation.
-///
-/// \param sessions The number of sessions to retrieve. Must be greater than 0.
-///
-/// \param completion The closure to be called when the response comes back, with optional dictionary of UInt to list of TradableCandle objects and optional TradableError object.
-- (void)getGroupedCandles:(TradableAccount * _Nonnull)forAccount symbol:(NSString * _Nonnull)symbol candleAggregation:(enum TradableAggregation)candleAggregation sessions:(NSInteger)sessions completion:(void (^ _Null_unspecified)(NSDictionary<NSNumber *, NSArray<TradableCandle *> *> * _Nullable groupedCandles, TradableError * _Nullable error))completion;
-
 /// Presents Order Entry widget. Assigns TradableEventDelegate to itself. When TradableInstrumentSelector is presented, assigns TradableSearchDelegate to it.
 ///
 /// \param forAccount The account for which the widget should be presented.
@@ -1000,12 +324,6 @@ SWIFT_CLASS("_TtC11TradableAPI32TradableAPIAuthenticationRequest")
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password OBJC_DESIGNATED_INITIALIZER;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithAppId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password externalId:(NSString * _Nullable)externalId OBJC_DESIGNATED_INITIALIZER;
-
-/// Creates an object with given parameters.
 - (nonnull instancetype)initWithAppKey:(NSString * _Nonnull)appKey appId:(uint64_t)appId brokerId:(NSInteger)brokerId login:(NSString * _Nonnull)login password:(NSString * _Nonnull)password OBJC_DESIGNATED_INITIALIZER;
 
 /// Creates an object with given parameters.
@@ -1084,10 +402,26 @@ enum TradableTrackConfiguration : NSInteger;
 @class TradableOrderSupport;
 enum TradableInstrumentRetrieval : NSInteger;
 @class TradableProtectionEntryTypes;
+enum TradableUpdateType : NSInteger;
+enum TradableUpdateFrequency : NSInteger;
 @class TradableUpdateRequest;
+@class TradableAccountSnapshot;
+@class TradablePrices;
 @class TradableAccountMetrics;
+@class TradableOrders;
+@class TradableOrderCommand;
+@protocol TradableOrderStatusDelegate;
 @class TradableOrderProtection;
+@class TradablePositions;
+@class TradableCandleRequest;
+@class TradableCandles;
+enum TradableAggregation : NSInteger;
+@class TradableCandle;
+@class TradableLastSessionCloseRequest;
+@class TradableLastSessionClose;
+@class TradableInstrumentSearchResults;
 @class TradableInstrumentSearchRequest;
+@class TradableInstrumentList;
 
 
 /// An account used for trading.
@@ -1236,23 +570,6 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 ///
 /// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
 - (void)issueNewMarketOrderForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completionHandler;
-
-/// Issues a new market order with protections.
-///
-/// \param instrument The instrument for which the order should be issued.
-///
-/// \param amount The amount of the order.
-///
-/// \param side The side of the order.
-///
-/// \param takeProfitDistance An optional price distance of take profit protection.
-///
-/// \param stopLossDistance An optional price distance of stop loss protection.
-///
-/// \param orderDelegate An optional TradableOrderStatusDelegate to notify when the order status changes.
-///
-/// \param completionHandler The closure to be called when the response comes back, with an optional TradableOrder object and an optional TradableError object. TradableOrder is an order that will have been created. Getting it back in the closure doesn't mean that the order has been executed; check its status in tradableOrdersUpdated delegate method.
-- (void)issueNewMarketOrderWithProtectionsForInstrument:(TradableInstrument * _Nonnull)instrument amount:(double)amount side:(enum TradableOrderSide)side takeProfitDistance:(TradableDistance * _Nullable)takeProfitDistance stopLossDistance:(TradableDistance * _Nullable)stopLossDistance orderDelegate:(id <TradableOrderStatusDelegate> _Nullable)orderDelegate completionHandler:(void (^ _Null_unspecified)(TradableOrder * _Nullable order, TradableError * _Nullable error))completionHandler;
 
 /// Issues a new market order with protections.
 ///
@@ -1579,9 +896,6 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 /// The unique instrument identifier to get candles for.
 @property (nonatomic, readonly, copy) NSString * _Nonnull instrumentId;
 
-/// The symbol to get candles for.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
-
 /// The start of the candle range; Unix timestamp in milliseconds.
 @property (nonatomic, readonly) uint64_t from;
 
@@ -1596,15 +910,6 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableCandleRequest")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * _Nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(NSInteger)aggregation OBJC_DESIGNATED_INITIALIZER;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * _Nonnull)symbol fromDate:(NSDate * _Nonnull)fromDate toDate:(NSDate * _Nonnull)toDate aggregation:(NSInteger)aggregation OBJC_DESIGNATED_INITIALIZER;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * _Nonnull)symbol from:(uint64_t)from to:(uint64_t)to aggregation:(NSInteger)aggregation indicatorRequest:(TradableIndicatorRequest * _Nullable)indicatorRequest OBJC_DESIGNATED_INITIALIZER;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithInstrumentId:(NSString * _Nonnull)instrumentId from:(uint64_t)from to:(uint64_t)to aggregation:(NSInteger)aggregation OBJC_DESIGNATED_INITIALIZER;
@@ -1655,9 +960,6 @@ SWIFT_CLASS("_TtC11TradableAPI36TradableDemoAPIAuthenticationRequest")
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
 /// Creates an object with given parameters.
-- (nonnull instancetype)initWithAppId:(uint64_t)appId type:(enum TradableDemoAccountType)type OBJC_DESIGNATED_INITIALIZER;
-
-/// Creates an object with given parameters.
 - (nonnull instancetype)initWithAppKey:(NSString * _Nonnull)appKey appId:(uint64_t)appId type:(enum TradableDemoAccountType)type OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -1674,22 +976,6 @@ typedef SWIFT_ENUM(NSInteger, TradableDemoAccountType) {
 
 
 
-/// A wrapper class for order protection distance.
-SWIFT_CLASS("_TtC11TradableAPI16TradableDistance")
-@interface TradableDistance : NSObject
-
-/// The price distance of protection.
-@property (nonatomic, readonly) double distance;
-
-/// Simple description of this object.
-@property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithDistance:(double)distance OBJC_DESIGNATED_INITIALIZER;
-@end
-
-
-
 /// The delegate protocol for the Edit Order widget.
 SWIFT_PROTOCOL("_TtP11TradableAPI25TradableEditOrderDelegate_")
 @protocol TradableEditOrderDelegate
@@ -1698,6 +984,7 @@ SWIFT_PROTOCOL("_TtP11TradableAPI25TradableEditOrderDelegate_")
 - (void)tradableEditOrderDismissed;
 @end
 
+@class NSHTTPURLResponse;
 enum TradableErrorType : NSInteger;
 
 
@@ -2103,9 +1390,6 @@ typedef SWIFT_ENUM(NSInteger, TradableInstrumentType) {
 SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
 @interface TradableLastSessionClose : NSObject
 
-/// The symbol.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
-
 /// The instrument ID.
 @property (nonatomic, readonly, copy) NSString * _Nonnull instrumentId;
 
@@ -2125,17 +1409,11 @@ SWIFT_CLASS("_TtC11TradableAPI24TradableLastSessionClose")
 SWIFT_CLASS("_TtC11TradableAPI31TradableLastSessionCloseRequest")
 @interface TradableLastSessionCloseRequest : NSObject
 
-/// The list of symbols for which the close prices should be retrieved.
-@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull symbols;
-
 /// The list of instruments' IDs for which the close prices should be retrieved.
 @property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull instrumentIds;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * _Nonnull)symbols OBJC_DESIGNATED_INITIALIZER;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithInstrumentIds:(NSArray<NSString *> * _Nonnull)instrumentIds OBJC_DESIGNATED_INITIALIZER;
@@ -2203,6 +1481,7 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOSUser")
 
 enum TradableOrderType : NSInteger;
 enum TradableOrderStatus : NSInteger;
+@class TradableOrderModification;
 
 
 /// Contains the order data, such as unique ID, instrument ID, amount, type, price, status and more.
@@ -2221,9 +1500,6 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 /// The unique identifier for the order's instrument.
 @property (nonatomic, readonly, copy) NSString * _Nonnull instrumentId;
 
-/// Symbol of the order.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
-
 /// Order side.
 @property (nonatomic, readonly) enum TradableOrderSide side;
 
@@ -2235,9 +1511,6 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 
 /// The price the limit or stop order will trigger at. For market orders it will be 0.
 @property (nonatomic, readonly) double price;
-
-/// Identifier of the affected position. Might not be available.
-@property (nonatomic, readonly, copy) NSString * _Nullable affectedPositionId;
 
 /// Identifiers of the affected positions. Might not be available.
 @property (nonatomic, readonly, copy) NSArray<NSString *> * _Nullable affectedPositionsIds;
@@ -2263,11 +1536,6 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 /// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
 - (void)cancel:(void (^ _Null_unspecified)(TradableError * _Nullable error))completionHandler;
 
-/// Fetches the position that has been affected by this order.
-///
-/// \param completionHandler A closure containing an optional affected position.
-- (void)getAffectedPosition:(void (^ _Null_unspecified)(TradablePosition * _Nullable affectedPosition))completionHandler;
-
 /// Fetches the positions that have been affected by this order.
 ///
 /// \param completionHandler A closure containing an optional list of affected positions.
@@ -2291,9 +1559,6 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderCommand")
 /// The unique identifier for order's instrument.
 @property (nonatomic, readonly, copy) NSString * _Nonnull instrumentId;
 
-/// Instrument symbol for the order.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
-
 /// Amount of the order.
 @property (nonatomic, readonly) double amount;
 
@@ -2314,9 +1579,6 @@ SWIFT_CLASS("_TtC11TradableAPI20TradableOrderCommand")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbol:(NSString * _Nonnull)symbol amount:(double)amount price:(double)price side:(enum TradableOrderSide)side type:(enum TradableOrderType)type OBJC_DESIGNATED_INITIALIZER;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithInstrumentId:(NSString * _Nonnull)instrumentId amount:(double)amount price:(double)price side:(enum TradableOrderSide)side type:(enum TradableOrderType)type OBJC_DESIGNATED_INITIALIZER;
@@ -2461,6 +1723,8 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOrders")
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 @end
 
+enum TradableSingleProtection : NSInteger;
+@class TradableProtection;
 
 
 /// Contains the position data, such as unique ID, instrument ID, amount, side, open/closed profit and more.
@@ -2475,9 +1739,6 @@ SWIFT_CLASS("_TtC11TradableAPI16TradablePosition")
 
 /// Unix timestamp in milliseconds of the position creation.
 @property (nonatomic, readonly) uint64_t creationTime;
-
-/// Symbol of the position.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
 
 /// Open price of the position (volume-weighted average).
 @property (nonatomic, readonly) double openPrice;
@@ -2583,9 +1844,6 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 /// The unique identifier for the price's instrument.
 @property (nonatomic, readonly, copy) NSString * _Nonnull instrumentId;
 
-/// Symbol for which this object holds prices.
-@property (nonatomic, readonly, copy) NSString * _Nonnull symbol;
-
 /// The current value of one pip for one unit of this instrument converted to the account currency. If the instrument doesn't have pip precision this field contains the change in account currency when the price of the instrument moves one unit (1.0).
 @property (nonatomic, readonly) double pipValue;
 
@@ -2613,9 +1871,6 @@ SWIFT_CLASS("_TtC11TradableAPI14TradablePrices")
 
 /// Returns the dictionary values as an array.
 - (NSArray<TradablePrice *> * _Nonnull)getPrices;
-
-/// Returns an optional TradablePrice object for specified symbol.
-- (TradablePrice * _Nullable)getPriceForSymbol:(NSString * _Nonnull)symbol;
 
 /// Returns an optional TradablePrice object for specified instrument ID.
 - (TradablePrice * _Nullable)getPriceForInstrumentId:(NSString * _Nonnull)instrumentId;
@@ -2693,11 +1948,6 @@ SWIFT_PROTOCOL("_TtP11TradableAPI22TradableSearchDelegate_")
 @protocol TradableSearchDelegate
 @optional
 
-/// A delegate hook for getting back the search results.
-///
-/// \param instruments A list of TradableInstrument objects that matched the search phrase.
-- (void)tradableInstrumentsFound:(NSArray<TradableInstrument *> * _Nonnull)instruments;
-
 /// A delegate hook for getting back the instrument search results.
 ///
 /// \param searchResults A TradableinstrumentSearchResults objects containing results that matched the search phrase.
@@ -2714,50 +1964,6 @@ typedef SWIFT_ENUM(NSInteger, TradableSingleProtection) {
 /// Stop loss protection.
   TradableSingleProtectionSTOPLOSS = 1,
 };
-
-
-
-/// Contains a list of symbols.
-SWIFT_CLASS("_TtC11TradableAPI18TradableSymbolList")
-@interface TradableSymbolList : NSObject
-
-/// The list of symbols for which to get detailed instrument information.
-@property (nonatomic, readonly, copy) NSArray<NSString *> * _Nonnull symbols;
-
-/// Simple description of this object.
-@property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * _Nonnull)symbols OBJC_DESIGNATED_INITIALIZER;
-@end
-
-
-
-/// Contains a list of symbols.
-SWIFT_CLASS("_TtC11TradableAPI15TradableSymbols")
-@interface TradableSymbols : NSObject
-
-/// A constant that can be passed into symbols array for getting price updates for portfolio's symbols.
-+ (NSString * _Nonnull)ALL_OPEN_POSITIONS;
-
-/// A list of symbols.
-@property (nonatomic, copy) NSArray<NSString *> * _Nonnull symbols;
-
-/// If this is true, each price object will contain a Margin Bands object. Defaults to false.
-@property (nonatomic) BOOL includeMarginFactors;
-
-/// Simple description of this object.
-@property (nonatomic, readonly, copy) NSString * _Nonnull description;
-
-/// Creates an object with given parameters.
-- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * _Nonnull)symbols includeMarginFactors:(BOOL)includeMarginFactors OBJC_DESIGNATED_INITIALIZER;
-
-/// A convenience initializer that creates TradableSymbols object with a list of symbols. Sets includeMarginFactors to false.
-- (nonnull instancetype)initWithSymbols:(NSArray<NSString *> * _Nonnull)symbols;
-
-/// A builder pattern method that allows to append a symbol to this object's list of symbols.
-- (TradableSymbols * _Nonnull)withSymbol:(NSString * _Nonnull)symbol;
-@end
 
 
 /// Possible track configurations.

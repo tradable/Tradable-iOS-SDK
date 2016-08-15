@@ -1,17 +1,26 @@
+v1.24
+
+- Removed obsoleted and deprecated classes, methods and fields.
+- Integrated with CocoaPods to use dependencies. See readme for the latest versions of pods used.
+
+
 v1.23
 
 - Added appKey property to TradableAPIAuthenticationRequest and TradableDemoAPIAuthenticationRequest.
 - Marked deprecated fields and methods as obsolete.
+
 
 v1.22
 
 - Fixed a problem that prevented market orders from being sent.
 - Refined instrument search.
 
+
 v1.21
 
 - Deprecated classes, methods and properties that deal with protections expressed as price distance. Introduced protectionEntryTypes property on TradableAccount object, which contains a list of TradableProtectionEntryType objects. When issuing an order with protections, one has to check what types of protection entries are supported: absolute price or price distance.
 - Added externalId property to TradableAPIAuthenticationRequest.
+
 
 v1.20
 
@@ -19,6 +28,7 @@ v1.20
 - Deprecated calls that retrieve full instrument list. Instrument search is to be used instead.
 - Added new instrument type to TradableInstrumentType enum: UNKNOWN.
 - Revised UI widgets.
+
 
 v1.19
 

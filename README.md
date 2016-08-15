@@ -1,4 +1,4 @@
-Tradable Embed for iOS - build financial trading capabilities into your apps.
+Tradable SDK for iOS - build financial trading capabilities into your apps.
 Swift and Objective-C compatible.
 
 Learn more at https://tradable.com.
@@ -6,6 +6,20 @@ Learn more at https://tradable.com.
 Read documentation at http://tradable.github.io/ios/docs/.
 
 
+<h1>Installation</h1>
+Drag <i>TradableAPI.framework</i> to <b>Embedded Binaries</b> section in <b>General</b> tab of your target. Check <b>Copy files if necessary</b> box.
+
+
+<h1>CocoaPods</h1>
+While itself not available through CocoaPods, Tradable iOS SDK uses the following pods:
+- <a href=https://github.com/Alamofire/Alamofire>Alamofire</a> version 3.4.1
+- <a href=https://github.com/SwiftyJSON/SwiftyJSON>SwiftyJSON</a> version 2.3.1
+- <a href=https://github.com/jrendel/SwiftKeychainWrapper>SwiftKeychainWrapper</a> version 2.0.0
+
+In order to be able to use this framework, please include these pods in your Podfile. More information about CocoaPods can be found <a href=https://cocoapods.org/>here</a>.
+
+
+<h1>Usage</h1>
 Steps to use the API:
 
 1.  In <i>Info.plist</i>, add a custom URL Scheme - a redirect URI from OAuth flow. When the access token is granted, you will be redirected from Safari to that URI. Make sure it will end up opening your app.
@@ -33,7 +47,7 @@ Steps to use the API:
 4. Listen for <i>tradableReady(forAccount: TradableAccount)</i> auth delegate method call. The API is ready to be used!
 
 
-<br />
+<h1>Examples</h1>
 Handling multiple updates:
 
 Should you be in need to show data across user's accounts, you can invoke 'startUpdates(...)' method for as many accounts as you wish. The TradableEventDelegate's callbacks come back with objects such as e.g. TradableAccountSnapshot which contain 'forAccount' field of type TradableAccount. This way you know what account you have received an update for.
