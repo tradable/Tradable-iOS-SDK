@@ -415,8 +415,6 @@ enum TradableUpdateFrequency : NSInteger;
 @class TradablePositions;
 @class TradableCandleRequest;
 @class TradableCandles;
-enum TradableAggregation : NSInteger;
-@class TradableCandle;
 @class TradableLastSessionCloseRequest;
 @class TradableLastSessionClose;
 @class TradableInstrumentSearchResults;
@@ -613,17 +611,6 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 ///
 /// \param completionHandler The closure to be called when the response comes back, with an optional TradableCandles object and an optional TradableError object.
 - (void)getCandlesWithRequest:(TradableCandleRequest * _Nonnull)candleRequest completionHandler:(void (^ _Null_unspecified)(TradableCandles * _Nullable candles, TradableError * _Nullable error))completionHandler;
-
-/// Returns candles grouped into open market sessions.
-///
-/// \param instrument The instrument for which the candles should be retrieved.
-///
-/// \param aggregation The candle aggregation.
-///
-/// \param sessions The number of sessions to retrieve. Must be greater than 0.
-///
-/// \param completionHandler The closure to be called when the response comes back, with an optional dictionary of UInt to list of TradableCandle objects and an optional TradableError object.
-- (void)getGroupedCandlesForInstrument:(TradableInstrument * _Nonnull)instrument aggregation:(enum TradableAggregation)aggregation sessions:(NSInteger)sessions completionHandler:(void (^ _Null_unspecified)(NSDictionary<NSNumber *, NSArray<TradableCandle *> *> * _Nullable groupedCandles, TradableError * _Nullable error))completionHandler;
 
 /// Gets the last session's close.
 ///

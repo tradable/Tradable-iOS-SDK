@@ -1,3 +1,9 @@
+v1.25
+
+- BREAKING CHANGE: Changed the signature of getGroupedCandlesForInstrument method on TradableAccount; sessions parameter is of type UInt now and groupedCandles object in completion block is a dictionary of UInt64 to a list of TradableCandle objects.
+- Fixed an overflow bug on 32-bit devices when using methods returning candles.
+
+
 v1.24
 
 - Removed obsoleted and deprecated classes, methods and fields.
