@@ -1590,14 +1590,35 @@ SWIFT_PROTOCOL("_TtP11TradableAPI26TradableOrderEntryDelegate_")
 SWIFT_CLASS("_TtC11TradableAPI25TradableOrderModification")
 @interface TradableOrderModification : NSObject
 
-/// A price the order should be modified with.
-@property (nonatomic, readonly) double price;
+/// The new stop loss, or nil to remove any stop loss on the order.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable stopLoss;
+
+/// The new take profit, or nil to remove any take profit on the order.
+@property (nonatomic, readonly, strong) TradableOrderProtection * _Nullable takeProfit;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 
 /// Creates an object with given parameters.
 - (nonnull instancetype)initWithPrice:(double)price OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithPrice:(double)price stopLoss:(TradableOrderProtection * _Nullable)stopLoss OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithPrice:(double)price takeProfit:(TradableOrderProtection * _Nullable)takeProfit OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithPrice:(double)price stopLoss:(TradableOrderProtection * _Nullable)stopLoss takeProfit:(TradableOrderProtection * _Nullable)takeProfit OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithStopLoss:(TradableOrderProtection * _Nullable)stopLoss OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithTakeProfit:(TradableOrderProtection * _Nullable)takeProfit OBJC_DESIGNATED_INITIALIZER;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithStopLoss:(TradableOrderProtection * _Nullable)stopLoss takeProfit:(TradableOrderProtection * _Nullable)takeProfit OBJC_DESIGNATED_INITIALIZER;
 @end
 
 enum TradableProtectionEntryType : NSInteger;
@@ -1606,6 +1627,12 @@ enum TradableProtectionEntryType : NSInteger;
 /// A protection specified on an order.
 SWIFT_CLASS("_TtC11TradableAPI23TradableOrderProtection")
 @interface TradableOrderProtection : NSObject
+
+/// The type of the entry.
+@property (nonatomic, readonly) enum TradableProtectionEntryType entryType;
+
+/// The value of the protection, as defined by the entry type.
+@property (nonatomic, readonly) double value;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -1711,6 +1738,7 @@ SWIFT_CLASS("_TtC11TradableAPI14TradableOrders")
 @end
 
 enum TradableSingleProtection : NSInteger;
+@class TradablePriceModification;
 @class TradableProtection;
 
 
@@ -1762,6 +1790,15 @@ SWIFT_CLASS("_TtC11TradableAPI16TradablePosition")
 ///
 /// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
 - (void)modifySingleProtectionOfType:(enum TradableSingleProtection)protectionType withOrderModification:(TradableOrderModification * _Nonnull)orderModification completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable error))completionHandler;
+
+/// Adds or modifies a single protection.
+///
+/// \param protectionType The type of protection that should be added or modified.
+///
+/// \param withPriceModification The TradablePriceModification object containing the changes to be made to a protection.
+///
+/// \param completionHandler A closure to be called when the response comes back, with an optional TradableError object.
+- (void)modifySingleProtectionOfType:(enum TradableSingleProtection)protectionType withPriceModification:(TradablePriceModification * _Nonnull)priceModification completionHandler:(void (^ _Null_unspecified)(TradableError * _Nullable error))completionHandler;
 
 /// Cancels a single protection.
 ///
@@ -1839,6 +1876,22 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+
+/// Contains information with which the order will be modified.
+SWIFT_CLASS("_TtC11TradableAPI25TradablePriceModification")
+@interface TradablePriceModification : NSObject
+
+/// A new trigger price the order should be modified with.
+@property (nonatomic, readonly) double price;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Creates an object with given parameters.
+- (nonnull instancetype)initWithPrice:(double)price OBJC_DESIGNATED_INITIALIZER;
 @end
 
 

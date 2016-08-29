@@ -1,3 +1,9 @@
+v1.26
+
+- Added TradablePriceModification object that has to be used when modifying protections on positions.
+- Added optional properties takeProfit and stopLoss to TradableOrderModification. 
+
+
 v1.25
 
 - BREAKING CHANGE: Changed the signature of getGroupedCandlesForInstrument method on TradableAccount; sessions parameter is of type UInt now and groupedCandles object in completion block is a dictionary of UInt64 to a list of TradableCandle objects.
