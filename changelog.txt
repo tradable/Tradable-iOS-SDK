@@ -1,3 +1,8 @@
+v1.27
+
+- Compiled the SDK with Swift 2.3 compiler (using Xcode 8).
+
+
 v1.26
 
 - Added TradablePriceModification object that has to be used when modifying protections on positions.
