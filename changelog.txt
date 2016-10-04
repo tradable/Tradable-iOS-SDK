@@ -1,3 +1,10 @@
+v1.28
+
+- Added TradableOrderSizeIncrementBand, TradableOrderSizeIncrementBands, TradablePriceIncrementBand and TradablePriceIncrementBands classes used for order size and price calculations.
+- Added orderSizeIncrements and priceIncrements to TradableInstrument. Deprecated minAmount, multipleOfMinAmount and decimals properties.
+- Added errorDetails and errorDebug properties to TradableError.
+
+
 v1.27
 
 - Compiled the SDK with Swift 2.3 compiler (using Xcode 8).

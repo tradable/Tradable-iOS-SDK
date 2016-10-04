@@ -988,6 +988,12 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableError")
 /// A description of the error.
 @property (nonatomic, readonly, copy) NSString * _Nonnull errorDescription;
 
+/// The debug info of the error.
+@property (nonatomic, readonly, copy) NSString * _Nonnull errorDebug;
+
+/// The error details. Might be nil.
+@property (nonatomic, readonly, copy) NSString * _Nullable errorDetails;
+
 /// The type of the error.
 @property (nonatomic, readonly) enum TradableErrorType errorType;
 
@@ -1186,6 +1192,8 @@ SWIFT_CLASS("_TtC11TradableAPI24TradableIndicatorRequest")
 @end
 
 enum TradableInstrumentType : NSInteger;
+@class TradableOrderSizeIncrementBands;
+@class TradablePriceIncrementBands;
 
 
 /// Contains instrument data, such as symbol, type, precision and more.
@@ -1230,6 +1238,12 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 
 /// The instrument type.
 @property (nonatomic, readonly) enum TradableInstrumentType type;
+
+/// The order size increments at different size ranges.
+@property (nonatomic, readonly, strong) TradableOrderSizeIncrementBands * _Nonnull orderSizeIncrements;
+
+/// The price increments defining the decimal precision at different price levels.
+@property (nonatomic, readonly, strong) TradablePriceIncrementBands * _Nonnull priceIncrements;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
@@ -1653,6 +1667,38 @@ typedef SWIFT_ENUM(NSInteger, TradableOrderSide) {
 };
 
 
+
+/// The order size increment for orders over a given lowerBound.
+SWIFT_CLASS("_TtC11TradableAPI30TradableOrderSizeIncrementBand")
+@interface TradableOrderSizeIncrementBand : NSObject
+
+/// The order size increment for orders over a given lowerBound.
+@property (nonatomic, readonly) double lowerBound;
+
+/// The order size increment for orders over the given lowerBounds (and up to the next band).
+@property (nonatomic, readonly) double increment;
+
+/// The number of decimals used to format a size in this band.
+@property (nonatomic, readonly) NSInteger decimals;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+
+/// A collection of order size increment bands, defining the order size increments at different order sizes.
+SWIFT_CLASS("_TtC11TradableAPI31TradableOrderSizeIncrementBands")
+@interface TradableOrderSizeIncrementBands : NSObject
+
+/// A list of order size increment bands.
+@property (nonatomic, readonly, copy) NSArray<TradableOrderSizeIncrementBand *> * _Nonnull orderSizeIncrementBands;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
 /// Possible statuses of order.
 typedef SWIFT_ENUM(NSInteger, TradableOrderStatus) {
 
@@ -1873,6 +1919,38 @@ SWIFT_CLASS("_TtC11TradableAPI13TradablePrice")
 
 /// Optional object that may be included when 'includeMarginFactors' is true. Contains information that can be used to estimate margin requirement before placing an order. Not all trading systems expose their instrument leverage so this field may not be present for all brokers.
 @property (nonatomic, readonly, strong) TradableMarginBands * _Nullable marginBands;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+
+/// The price increment for a price above the lowerBound (and up to the next band).
+SWIFT_CLASS("_TtC11TradableAPI26TradablePriceIncrementBand")
+@interface TradablePriceIncrementBand : NSObject
+
+/// Prices above this lowerBound should be placed in the given increments.
+@property (nonatomic, readonly) double lowerBound;
+
+/// The price increments for a price above the lowerBound and up to the next band.
+@property (nonatomic, readonly) double increment;
+
+/// The number of decimals used to format a price in this band.
+@property (nonatomic, readonly) NSInteger decimals;
+
+/// Simple description of this object.
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+@end
+
+
+
+/// A collection of price increment bands, defining the price precision at different order prices.
+SWIFT_CLASS("_TtC11TradableAPI27TradablePriceIncrementBands")
+@interface TradablePriceIncrementBands : NSObject
+
+/// A list of price increment bands.
+@property (nonatomic, readonly, copy) NSArray<TradablePriceIncrementBand *> * _Nonnull priceIncrementBands;
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
