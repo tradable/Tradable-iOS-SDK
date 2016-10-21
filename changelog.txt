@@ -1,3 +1,12 @@
+v1.29
+
+- Added Broker Sign In widget and a TradableBrokerSignInDelegate to listen for widget dismissal.
+- Added .Metrics update type.
+- Added linkedBrokerId property to TradableBroker.
+- Fixed an issue with incorrect endpoint for requests.
+- Fixed an issue with some of the widgets not loading properly.
+
+
 v1.28
 
 - Added TradableOrderSizeIncrementBand, TradableOrderSizeIncrementBands, TradablePriceIncrementBand and TradablePriceIncrementBands classes used for order size and price calculations.

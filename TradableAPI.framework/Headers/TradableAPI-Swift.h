@@ -122,6 +122,7 @@ enum TradableOrderSide : NSInteger;
 @protocol TradableEditOrderDelegate;
 @class TradablePosition;
 @protocol TradablePositionDetailDelegate;
+@protocol TradableBrokerSignInDelegate;
 @protocol TradableEventsDelegate;
 @protocol TradableAuthDelegate;
 @protocol TradableSearchDelegate;
@@ -243,7 +244,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param completion The closure to be called when the response comes back, with optional list of TradableIndicatorInfo objects and optional TradableError object.
 - (void)getIndicatorsInfo:(TradableAccount * _Nonnull)forAccount completion:(void (^ _Null_unspecified)(NSArray<TradableIndicatorInfo *> * _Nullable indicatorsInfo, TradableError * _Nullable error))completion;
 
-/// Presents Order Entry widget. Assigns TradableEventDelegate to itself. When TradableInstrumentSelector is presented, assigns TradableSearchDelegate to it.
+/// Presents Order Entry widget. Assigns TradableEventDelegate to itself. When TradableInstrumentSelector is presented, assigns TradableSearchDelegate to it. Needs .Prices or .Full updates to be running.
 ///
 /// \param forAccount The account for which the widget should be presented.
 ///
@@ -269,7 +270,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param presentationStyle A style used when presenting the widget.
 - (void)presentInstrumentSelector:(TradableAccount * _Nonnull)forAccount delegate:(id <TradableInstrumentSelectorDelegate> _Nullable)delegate presentingViewController:(UIViewController * _Nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
 
-/// Presents Edit Order widget. Assigns TradableEventDelegate to itself.
+/// Presents Edit Order widget. Assigns TradableEventDelegate to itself. Needs .Orders or .Full updates to be running.
 ///
 /// \param forAccount The account for which the widget should be presented.
 ///
@@ -282,7 +283,7 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 /// \param presentationStyle A style used when presenting the widget.
 - (void)presentEditOrder:(TradableAccount * _Nonnull)forAccount order:(TradableOrder * _Nonnull)order delegate:(id <TradableEditOrderDelegate> _Nullable)delegate presentingViewController:(UIViewController * _Nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
 
-/// Presents Position Detail widget. Assigns TradableEventDelegate to itself.
+/// Presents Position Detail widget. Assigns TradableEventDelegate to itself. Needs .Positions or .Full updates to be running.
 ///
 /// \param forAccount The account for which the widget should be presented.
 ///
@@ -294,6 +295,15 @@ SWIFT_CLASS("_TtC11TradableAPI8Tradable")
 ///
 /// \param presentationStyle A style used when presenting the widget.
 - (void)presentPositionDetail:(TradableAccount * _Nonnull)forAccount position:(TradablePosition * _Nonnull)position delegate:(id <TradablePositionDetailDelegate> _Nullable)delegate presentingViewController:(UIViewController * _Nonnull)presentingViewController presentationStyle:(UIModalPresentationStyle)presentationStyle;
+
+/// Presents Broker Sign In widget.
+///
+/// \param forAppId The id of the app in which the widget is used.
+///
+/// \param delegate An optional TradableBrokerSignInDelegate that will be called when the widget is dismissed.
+///
+/// \param presentingViewController A view controller that will present the widget.
+- (void)presentBrokerSignInForAppId:(uint64_t)appId delegate:(id <TradableBrokerSignInDelegate> _Nullable)delegate presentingViewController:(UIViewController * _Nonnull)presentingViewController;
 @end
 
 
@@ -844,6 +854,16 @@ SWIFT_CLASS("_TtC11TradableAPI19TradableBrokerLogos")
 
 
 
+/// The delegate protocol for the Broker Sign In widget.
+SWIFT_PROTOCOL("_TtP11TradableAPI28TradableBrokerSignInDelegate_")
+@protocol TradableBrokerSignInDelegate
+
+/// Broker Sign In delegate hook for knowing about successful login, resulting in a TradableAccessToken. Called when the widget has been dismissed.
+- (void)tradableBrokerSignInDismissed:(TradableAccessToken * _Nonnull)accessToken;
+@end
+
+
+
 /// Historic candle class containing necessary candle information.
 SWIFT_CLASS("_TtC11TradableAPI14TradableCandle")
 @interface TradableCandle : NSObject
@@ -1247,6 +1267,34 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 
 /// Simple description of this object.
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
+
+/// Calculates a number of decimals used in price needed to send a correct order for an instrument.
+///
+/// \param price The price from which the decimals should be calculated.
+///
+/// \returns  A number of decimals.
+- (NSInteger)getDecimalsForPrice:(double)price;
+
+/// Calculates a number of decimals used in order size needed to send a correct order for an instrument.
+///
+/// \param orderSize The order size from which the decimals should be calculated.
+///
+/// \returns  A number of decimals.
+- (NSInteger)getDecimalsForOrderSize:(double)orderSize;
+
+/// Calculates the next valid price for an instrument.
+///
+/// \param price The price for which the next valid price should be calculated.
+///
+/// \returns  The next valid price.
+- (double)getNextValidPriceForPrice:(double)price;
+
+/// Calculates the previous valid price for an instrument.
+///
+/// \param price The price for which the previous valid price should be calculated.
+///
+/// \returns  The previous valid price.
+- (double)getPreviousValidPriceForPrice:(double)price;
 @end
 
 
@@ -2143,7 +2191,7 @@ SWIFT_CLASS("_TtC11TradableAPI21TradableUpdateRequest")
 /// Update type for managed mode.
 typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 
-/// Updates for account snapshot, orders, positions and prices. A list of instrument IDs for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
+/// Updates for account snapshot, orders, positions, prices and metrics. A list of instrument IDs for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
   TradableUpdateTypeFull = 0,
 
 /// Updates just for account positions.
@@ -2154,6 +2202,9 @@ typedef SWIFT_ENUM(NSInteger, TradableUpdateType) {
 
 /// Updates just for tick prices. A list of instrument IDs for which the prices will be fetched should be specified for this update type. If the list is empty, no prices will be retrieved.
   TradableUpdateTypePrices = 3,
+
+/// Updates just for account metrics.
+  TradableUpdateTypeMetrics = 4,
 };
 
 
