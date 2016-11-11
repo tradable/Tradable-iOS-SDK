@@ -5,118 +5,25 @@ Learn more at https://tradable.com.
 
 Read documentation at http://tradable.github.io/ios/docs/.
 
+## Requirements
 
-<h1>Installation</h1>
+- iOS 9.0+
+- Xcode 8.0+
+- Swift 3.0+
+
+## Installation
+
 Drag <i>TradableAPI.framework</i> to <b>Embedded Binaries</b> section in <b>General</b> tab of your target. Check <b>Copy files if necessary</b> box.
 
+### CocoaPods
 
-<h1>CocoaPods</h1>
-While itself not available through CocoaPods, Tradable iOS SDK uses the following pods:
-- <a href=https://github.com/Alamofire/Alamofire>Alamofire</a> version ~> 3.5
-- <a href=https://github.com/SwiftyJSON/SwiftyJSON>SwiftyJSON</a> version ~> 2.4
-- <a href=https://github.com/jrendel/SwiftKeychainWrapper>SwiftKeychainWrapper</a> version ~> 2.1 (branch "Swift2.3")
+While itself not available through CocoaPods, Tradable iOS SDK depends on the following pods:
+- [Alamofire](https://github.com/Alamofire/Alamofire) version ~> 4.0
+- [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON) version ~> 3.1
+- [SwiftKeychainWrapper](https://github.com/jrendel/SwiftKeychainWrapper) version ~> 3.0
 
-In order to be able to use this framework, please include these pods in your Podfile. More information about CocoaPods can be found <a href=https://cocoapods.org/>here</a>.
+In order to be able to use this framework, please include these pods in your Podfile. More information about CocoaPods can be found [here](https://cocoapods.org).
 
+## Usage
 
-<h1>Usage</h1>
-Steps to use the API:
-
-1.  In <i>Info.plist</i>, add a custom URL Scheme - a redirect URI from OAuth flow. When the access token is granted, you will be redirected from Safari to that URI. Make sure it will end up opening your app.
-
-2.  When your app is ready to use the TradableAPI, upon setting the TradableAuthDelegate, call:
-  - for OAuth flow (Live accounts):
-    <pre>
-    Tradable.activateOrAuthenticate(appId, uri, webView)
-    </pre>
-    where <i>appId</i> is client ID in OAuth flow, and <i>uri</i> is the redirect URI in OAuth flow; <i>webView</i> is an optional UIWebView component that you might use to start the OAuth flow in - if it’s nil, system browser will be used.
-  - for direct API flow (Demo accounts):
-    <pre>
-    Tradable.activateOrCreate(appId, accountType)
-    </pre>
-    where <i>appId</i> is your client ID, and <i>accountType</i> is the type of demo account (FOREX or STOCKS).
-3.  Implement the following UIApplicationDelegate method:
-  <pre>
-  func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
-        
-    Tradable.sharedInstance.activateAfterLaunchWithURL(url)
-        
-    return true
-  }
-  </pre>
-4. Listen for <i>tradableReady(forAccount: TradableAccount)</i> auth delegate method call. The API is ready to be used!
-
-
-<h1>Examples</h1>
-Handling multiple updates:
-
-Should you be in need to show data across user's accounts, you can invoke 'startUpdates(...)' method for as many accounts as you wish. The TradableEventDelegate's callbacks come back with objects such as e.g. TradableAccountSnapshot which contain 'forAccount' field of type TradableAccount. This way you know what account you have received an update for.
-<br />
-Consider the following example:
-
-<pre>
-import UIKit
-
-import TradableAPI
-
-class ViewController: UIViewController, TradableAuthDelegate, TradableEventsDelegate {
-
-    var accounts:[TradableAccount] = []
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        Tradable.sharedInstance.authDelegate = self
-        Tradable.sharedInstance.delegate = self
-
-        for _ in 0..<3 {
-            Tradable.sharedInstance.createDemoAccount(TradableDemoAPIAuthenticationRequest(appId: 100007, type: TradableDemoAccountType.STOCKS), completion: { (accessToken, error) in
-                if let accessToken = accessToken {
-                    Tradable.sharedInstance.activateAfterLaunchWithAccessToken(accessToken)
-                }
-            })
-        }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
-    func tradableReady(forAccount: TradableAccount) {
-        print("Tradable ready for account id = \(forAccount.uniqueId)")
-        
-        var i = 0
-        for account in accounts {
-            if account.uniqueId == forAccount.uniqueId {
-                break
-            }
-            i += 1
-        }
-        if i == accounts.count {
-            print("Account with id = \(forAccount.uniqueId) has been added.")
-            accounts.append(forAccount)
-            
-            Tradable.sharedInstance.startUpdates(forAccount, updateType: TradableUpdateType.Full, frequency: TradableUpdateFrequency.ThreeSeconds, symbols: TradableSymbols(symbols: [TradableSymbols.ALL_OPEN_POSITIONS]))
-            print("Started updates for account id = \(forAccount.uniqueId).")
-        }
-    }
-    
-    func tradableAuthenticationError(error: TradableError) {
-        print(error)
-    }
-
-    func tradableAccountMetricsUpdated(metrics: TradableAccountMetrics) {
-        print("Received metrics for account id = \(metrics.forAccount.uniqueId).")
-        
-        for account in accounts {
-            if account.uniqueId == metrics.forAccount.uniqueId {
-                print("Equity = \(metrics.equity)")
-            }
-        }
-    }
-    
-    func tradableUpdateError(error: TradableError) {
-        print(error)
-    }
-}
-</pre>
+See [Swift example](https://github.com/tradable/Tradable-iOS-SwiftPortfolio) or [Objective-C example](https://github.com/tradable/Tradable-iOS-ObjectivePortfolio) projects.
