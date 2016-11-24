@@ -1,3 +1,10 @@
+v1.31
+
+- Improved and fixed the widgets.
+- Added an Authentication Website widget and a UIViewController extension tradablePresentAuthenticationWebsite(forAppId:withUrl:) to present it.
+- OAuth authentication methods now optionally take a UIViewController instead of a UIWebView to begin the authentication flow.
+
+
 v1.30
 
  - Compiled the SDK with Swift 3.0.1 compiler (using Xcode 8.1).

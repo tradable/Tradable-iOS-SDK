@@ -123,7 +123,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #pragma clang diagnostic ignored "-Wproperty-attribute-mismatch"
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
 enum TradableDemoAccountType : NSInteger;
-@class UIWebView;
+@class UIViewController;
 @class TradableAccessToken;
 @class TradableAPIAuthenticationRequest;
 @class TradableError;
@@ -181,23 +181,23 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) Tradable * _
 
   \param uri OAuth flow redirect URL.
 
-  \param webView Optional UIWebView component used to open login website. If not specified, system browser will be opened.
+  \param viewController Optional UIViewController conforming to SFSafariViewControllerDelegate component used to transition to SFSafariViewController with login website. If not specified, system browser will be opened.
 
 */
-- (void)activateOrAuthenticateWithAppId:(uint64_t)appId uri:(NSString * _Nonnull)uri in:(UIWebView * _Nullable)webView;
+- (void)activateOrAuthenticateWithAppId:(uint64_t)appId uri:(NSString * _Nonnull)uri viewController:(UIViewController * _Nullable)viewController;
 /**
-  Begins authentication flow for Tradable; if webView is not specified, it opens a system browser in order to authorize. Doesn’t restore previous session’s token. Consider using activateOrAuthenticateWith(appId: UInt64, uri: String, in webView: UIWebView?) instead.
+  Begins authentication flow for Tradable; if viewController is nil, opens a system browser in order to authorize. Doesn’t restore previous session’s tokens. Consider using activateOrAuthenticateWith(appId: UInt64, uri: String, viewController: UIViewController?) instead.
   \param appId OAuth flow app ID.
 
   \param uri OAuth flow redirect URL.
 
-  \param webView Optional UIWebView component used to open login website. If not specified, system browser will be opened.
+  \param viewController Optional UIViewController conforming to SFSafariViewControllerDelegate component used to transition to SFSafariViewController with login website. If not specified, system browser will be opened.
 
 */
-- (void)authenticateWithAppId:(uint64_t)appId uri:(NSString * _Nonnull)uri in:(UIWebView * _Nullable)webView;
+- (void)authenticateWithAppId:(uint64_t)appId uri:(NSString * _Nonnull)uri viewController:(UIViewController * _Nullable)viewController;
 /**
   Tells the API to activate with URL containing access token. Should be called when system browser opens the application using TradableAPI.
-  When the access token is successfully created, tradableReady auth delegate method is called.
+  When the access token is successfully created, tradableReady auth delegate method is called. Dismisses an SFSafariViewController with login website if such was presented.
   \param url The URL containing the information needed in order to create access token.
 
 */
@@ -687,16 +687,10 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
   Searches for instruments that contain a specified phrase.
   \param searchPhrase The phrase that the instruments will be searched for.
 
-  \param completionHandler The closure to be called when the response comes back, with an optional TradableInstrumentSearchResults object and an optional TradableError object.
+  \param completionHandler The closure to be called when the response comes back, with an optional TradableInstrumentSearchResults object and an optional TradableError object. If nil, the results will be returned using current searchDelegate’s tradableInstrumentSearchResultsReceived method.
 
 */
-- (void)searchForInstrumentsWithContaining:(NSString * _Nonnull)searchPhrase completionHandler:(void (^ _Null_unspecified)(TradableInstrumentSearchResults * _Nullable, TradableError * _Nullable))completionHandler;
-/**
-  Searches for instruments that contain a specified phrase. Returns the results using current searchDelegate’s tradableInstrumentsFound method.
-  \param searchPhrase The phrase that the instruments will be searched for.
-
-*/
-- (void)searchForInstrumentsWithContaining:(NSString * _Nonnull)searchPhrase;
+- (void)searchForInstrumentsWithContaining:(NSString * _Nonnull)searchPhrase completionHandler:(void (^ _Nullable)(TradableInstrumentSearchResults * _Nullable, TradableError * _Nullable))completionHandler;
 /**
   Gets instruments.
   \param instrumentSearchRequest The request object containing a list of instrument IDs for which the instruments should be retrieved.
@@ -866,6 +860,21 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 - (void)getIcon:(void (^ _Null_unspecified)(UIImage * _Nullable))logoCompleted;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 @end
+
+/**
+  An enumeration for utility class errors.
+*/
+typedef SWIFT_ENUM(NSInteger, TradableArgumentError) {
+/**
+  Incorrect price error.
+*/
+  TradableArgumentErrorIncorrectPrice = 0,
+/**
+  Incorrect order size error.
+*/
+  TradableArgumentErrorIncorrectOrderSize = 1,
+};
+static NSString * _Nonnull const TradableArgumentErrorDomain = @"TradableAPI.TradableArgumentError";
 
 
 /**
@@ -1155,9 +1164,9 @@ enum TradableErrorType : NSInteger;
 SWIFT_CLASS("_TtC11TradableAPI13TradableError")
 @interface TradableError : NSObject
 /**
-  A raw http response returned with the error.
+  A raw http response returned with the error. Might be nil for errors not coming from the server.
 */
-@property (nonatomic, readonly, strong) NSHTTPURLResponse * _Nonnull rawHttpResponse;
+@property (nonatomic, readonly, strong) NSHTTPURLResponse * _Nullable rawHttpResponse;
 /**
   The error code.
 */
@@ -1492,24 +1501,6 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
 */
 @property (nonatomic, readonly, copy) NSString * _Nonnull description;
 /**
-  Calculates a number of decimals used in price needed to send a correct order for an instrument.
-  \param price The price from which the decimals should be calculated.
-
-
-  returns:
-  A number of decimals.
-*/
-- (NSInteger)getPriceDecimalsForPrice:(double)price;
-/**
-  Calculates a number of decimals used in order size needed to send a correct order for an instrument.
-  \param orderSize The order size from which the decimals should be calculated.
-
-
-  returns:
-  A number of decimals.
-*/
-- (NSInteger)getOrderSizeDecimalsForOrderSize:(double)orderSize;
-/**
   Calculates the next valid price for an instrument.
   \param price The price for which the next valid price should be calculated.
 
@@ -1527,6 +1518,24 @@ SWIFT_CLASS("_TtC11TradableAPI18TradableInstrument")
   The previous valid price.
 */
 - (double)getPreviousValidPriceFromPrice:(double)price;
+/**
+  Calculates the next valid order size for an instrument.
+  \param orderSize The order size for which the next valid order size should be calculated.
+
+
+  returns:
+  The next valid order size.
+*/
+- (double)getNextValidOrderSizeFromOrderSize:(double)orderSize;
+/**
+  Calculates the previous valid order size for an instrument.
+  \param price The order size for which the previous valid order size should be calculated.
+
+
+  returns:
+  The previous valid order size.
+*/
+- (double)getPreviousValidOrderSizeFromOrderSize:(double)orderSize;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 @end
 
@@ -2718,16 +2727,20 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 
   \param delegate An optional TradableOrderEntryDelegate that will be called when the widget is dismissed.
 
+  \param presentationStyle The widget’s presentation style. Defaults to UIModalPresentationStyle.fullScreen.
+
 */
-- (void)tradablePresentOrderEntryFor:(TradableAccount * _Nonnull)account with:(TradableInstrument * _Nullable)instrument withSide:(enum TradableOrderSide)side delegate:(id <TradableOrderEntryDelegate> _Nullable)delegate;
+- (void)tradablePresentOrderEntryFor:(TradableAccount * _Nonnull)account with:(TradableInstrument * _Nullable)instrument withSide:(enum TradableOrderSide)side delegate:(id <TradableOrderEntryDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
   Presents Instrument Selector widget.
   \param account The account for which the widget should be presented.
 
   \param delegate An optional TradableInstrumentSelectorDelegate that will handle the widget dismissal with selected instrument.
 
+  \param presentationStyle The widget’s presentation style. Defaults to UIModalPresentationStyle.fullScreen.
+
 */
-- (void)tradablePresentInstrumentSelectorFor:(TradableAccount * _Nonnull)account delegate:(id <TradableInstrumentSelectorDelegate> _Nullable)delegate;
+- (void)tradablePresentInstrumentSelectorFor:(TradableAccount * _Nonnull)account delegate:(id <TradableInstrumentSelectorDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
   Presents Edit Order widget. Starts full updates if no such updates are running.
   \param account The account for which the widget should be presented.
@@ -2736,8 +2749,10 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 
   \param delegate An optional TradableEditOrderDelegate that will be called when the widget is dismissed.
 
+  \param presentationStyle The widget’s presentation style. Defaults to UIModalPresentationStyle.fullScreen.
+
 */
-- (void)tradablePresentEditOrderFor:(TradableAccount * _Nonnull)account with:(TradableOrder * _Nonnull)order delegate:(id <TradableEditOrderDelegate> _Nullable)delegate;
+- (void)tradablePresentEditOrderFor:(TradableAccount * _Nonnull)account with:(TradableOrder * _Nonnull)order delegate:(id <TradableEditOrderDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
   Presents Position Detail widget. Starts positions updates if no such updates are running.
   \param account The account for which the widget should be presented.
@@ -2746,16 +2761,28 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 
   \param delegate An optional TradablePositionDetailDelegate that will be called when the widget is dismissed.
 
+  \param presentationStyle The widget’s presentation style. Defaults to UIModalPresentationStyle.fullScreen.
+
 */
-- (void)tradablePresentPositionDetailFor:(TradableAccount * _Nonnull)account with:(TradablePosition * _Nonnull)position delegate:(id <TradablePositionDetailDelegate> _Nullable)delegate;
+- (void)tradablePresentPositionDetailFor:(TradableAccount * _Nonnull)account with:(TradablePosition * _Nonnull)position delegate:(id <TradablePositionDetailDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
   Presents Broker Sign In widget.
   \param appId The id of the app in which the widget is used.
 
   \param delegate An optional TradableBrokerSignInDelegate that will be called when the widget is dismissed.
 
+  \param presentationStyle The widget’s presentation style. Defaults to UIModalPresentationStyle.fullScreen.
+
 */
-- (void)tradablePresentBrokerSignInForAppId:(uint64_t)appId delegate:(id <TradableBrokerSignInDelegate> _Nullable)delegate;
+- (void)tradablePresentBrokerSignInForAppId:(uint64_t)appId delegate:(id <TradableBrokerSignInDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
+/**
+  Presents an SFSafariViewController with a login website in order to authenticate. The view controller used to present it should conform to SFSafariViewControllerDelegate.
+  \param appId OAuth flow app ID.
+
+  \param uri OAuth flow redirect URL.
+
+*/
+- (void)tradablePresentAuthenticationWebsiteForAppId:(uint64_t)appId withUri:(NSString * _Nonnull)uri;
 @end
 
 #pragma clang diagnostic pop
