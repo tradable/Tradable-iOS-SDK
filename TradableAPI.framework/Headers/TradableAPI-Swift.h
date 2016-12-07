@@ -538,7 +538,7 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 */
 - (void)setUpdatesRequest:(TradableUpdatesRequest * _Nonnull)request;
 /**
-  Starts candle updates for this account; stops previous candle updates for this account, if such were in action.
+  Starts candle updates for this account; stops previous candle updates for this account, if such were in action. Will start prices updates if there were no updates running, or full updates if the updates running were neither full nor prices.
   \param instrument The instrument for which the updates should be started.
 
   \param aggregation The aggregation (in minutes) for which the updates should be started.
@@ -548,7 +548,7 @@ SWIFT_CLASS("_TtC11TradableAPI15TradableAccount")
 */
 - (void)startCandleUpdatesFor:(TradableInstrument * _Nonnull)instrument aggregation:(NSInteger)aggregation from:(uint64_t)from;
 /**
-  Stops candle updates for this account.
+  Stops candle updates for this account. Does not stop prices/full updates if such were started by starting candle updates. If you want to stop all updates, call also stopUpdates().
 */
 - (void)stopCandleUpdates;
 /**
@@ -862,7 +862,7 @@ SWIFT_CLASS("_TtC11TradableAPI11TradableApp")
 @end
 
 /**
-  An enumeration for utility class errors.
+  An enumeration for incorrect argument errors.
 */
 typedef SWIFT_ENUM(NSInteger, TradableArgumentError) {
 /**
@@ -873,6 +873,10 @@ typedef SWIFT_ENUM(NSInteger, TradableArgumentError) {
   Incorrect order size error.
 */
   TradableArgumentErrorIncorrectOrderSize = 1,
+/**
+  Incorrect order status.
+*/
+  TradableArgumentErrorIncorrectOrderStatus = 2,
 };
 static NSString * _Nonnull const TradableArgumentErrorDomain = @"TradableAPI.TradableArgumentError";
 
@@ -1922,6 +1926,15 @@ SWIFT_CLASS("_TtC11TradableAPI13TradableOrder")
 
 */
 - (void)getInstrument:(void (^ _Null_unspecified)(TradableInstrument * _Nullable, TradableError * _Nullable))completionHandler;
+/**
+  Sets a TradableOrderStatusDelegate for this order. The delegate will be notified about order status change. Starts full updates if no orders or full updates are running, or orders updates if no updates are running at all. The delegate will not be called if full/orders updates are not running!
+  \param delegate The delegate to be set. If nil, the delegate previously assigned will be removed.
+
+
+  throws:
+  TradableArgumentError.incorrectOrderStatus if the order status is incorrect (not .pending).
+*/
+- (BOOL)setStatusChangeDelegate:(id <TradableOrderStatusDelegate> _Nullable)delegate error:(NSError * _Nullable * _Nullable)error;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 @end
 
@@ -2133,17 +2146,22 @@ typedef SWIFT_ENUM(NSInteger, TradableOrderStatus) {
 
 
 /**
-  A delegate protocol for getting notifications about order status changes.
+  A delegate protocol for getting notifications about order status changes. The delegate methods will not be called if full/orders updates are not running!
 */
 SWIFT_PROTOCOL("_TtP11TradableAPI27TradableOrderStatusDelegate_")
 @protocol TradableOrderStatusDelegate
-@optional
 /**
   A delegate hook for getting order status changes.
-  \param order A TradableOrder object whose status changed.
+  \param order A TradableOrder object whose status changed (from .pending into one of the final states: .executed or .cancelled). It is in its most recent state.
 
 */
 - (void)tradableOrderStatusChangedFor:(TradableOrder * _Nonnull)order;
+/**
+  A delegate hook for getting order status errors.
+  \param orderId The id of the TradableOrder’s object whose status is unknown due to system error (such as server crash, connection loss, etc.).
+
+*/
+- (void)tradableOrderStatusUnknownFor:(NSString * _Nonnull)orderId;
 @end
 
 
@@ -2610,6 +2628,52 @@ typedef SWIFT_ENUM(NSInteger, TradableTrackConfiguration) {
   TradableTrackConfigurationMultiNoHedge = 2,
 };
 
+
+/**
+  Returned any time the broker requires two factor authentication.
+*/
+SWIFT_CLASS("_TtC11TradableAPI40TradableTwoFactorAuthenticationChallenge")
+@interface TradableTwoFactorAuthenticationChallenge : NSObject
+/**
+  The endpoint URL the client must POST a TradableTwoFactorAuthenticationResponse to after receiving two factor authentication challenge.
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull endpointUrl;
+/**
+  The instruction to display to the user, describing how to satisfy the challenge.
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull instruction;
+/**
+  A token that needs to be sent to the endpoint (wrapped in TradableTwoFactorAuthenticationResponse object).
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull token;
+/**
+  Simple description of this object.
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
+@end
+
+
+/**
+  The client’s response to the TradableTwoFactorAuthenticationChallenge. Should be polled to the endpoint until a 200 OK is returned. If this occurs during authentication, the 200 response will be the TradableAccessToken that would have been returned by authentication methods if there had been no two factor authentication challenge.
+*/
+SWIFT_CLASS("_TtC11TradableAPI39TradableTwoFactorAuthenticationResponse")
+@interface TradableTwoFactorAuthenticationResponse : NSObject
+/**
+  The token from the TradableTwoFactorAuthenticationChallenge.
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull token;
+/**
+  Simple description of this object.
+*/
+@property (nonatomic, readonly, copy) NSString * _Nonnull description;
+/**
+  Creates an object with given parameters.
+*/
+- (nonnull instancetype)initWithToken:(NSString * _Nonnull)token OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
+@end
+
 /**
   Possible frequencies of the updates.
 */
@@ -2712,13 +2776,25 @@ typedef SWIFT_ENUM(NSInteger, TradableUtilitiesError) {
 static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.TradableUtilitiesError";
 
 
+@interface UINavigationController (SWIFT_EXTENSION(TradableAPI))
+/**
+  Presents an Account Details view controller. If showDisconnectButton is true, the view controller will show a button that, when tapped, presents a dialog asking the user whether to disconnect the currently used account. If the user decides to do so, the token for the account is removed from the SDK and the view controller performs an unwind segue called tradableBackToStart. Make sure to implement the segue in a view controller that is a starting point for the app (or otherwise makes sense to show while the SDK is non-working mode). Starts full updates if no metrics or full updates are running, or metrics updates if no updates are running at all.
+  \param appId OAuth flow app ID.
+
+  \param uri OAuth flow redirect URL.
+
+*/
+- (void)tradablePresentAccountDetailsFor:(TradableAccount * _Nonnull)account showDisconnectButton:(BOOL)showDisconnectButton;
+@end
+
+
 @interface UIView (SWIFT_EXTENSION(TradableAPI))
 @end
 
 
 @interface UIViewController (SWIFT_EXTENSION(TradableAPI))
 /**
-  Presents Order Entry widget. Starts prices updates if no such updates are running.
+  Presents an Order Entry widget. Starts full updates if no prices or full updates are running, or prices updates if no updates are running at all.
   \param account The account for which the widget should be presented.
 
   \param instrument An optional, preselected instrument in the widget. If nil, no instrument will be preselected.
@@ -2732,7 +2808,7 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 */
 - (void)tradablePresentOrderEntryFor:(TradableAccount * _Nonnull)account with:(TradableInstrument * _Nullable)instrument withSide:(enum TradableOrderSide)side delegate:(id <TradableOrderEntryDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
-  Presents Instrument Selector widget.
+  Presents an Instrument Selector widget.
   \param account The account for which the widget should be presented.
 
   \param delegate An optional TradableInstrumentSelectorDelegate that will handle the widget dismissal with selected instrument.
@@ -2742,7 +2818,7 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 */
 - (void)tradablePresentInstrumentSelectorFor:(TradableAccount * _Nonnull)account delegate:(id <TradableInstrumentSelectorDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
-  Presents Edit Order widget. Starts full updates if no such updates are running.
+  Presents an Edit Order widget. Starts full updates if no (such) updates are running.
   \param account The account for which the widget should be presented.
 
   \param order The order whose details will be displayed and which is to be edited.
@@ -2754,7 +2830,7 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 */
 - (void)tradablePresentEditOrderFor:(TradableAccount * _Nonnull)account with:(TradableOrder * _Nonnull)order delegate:(id <TradableEditOrderDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
-  Presents Position Detail widget. Starts positions updates if no such updates are running.
+  Presents a Position Detail widget. Starts full updates if no positions or full updates are running, or positions updates if no updates are running at all.
   \param account The account for which the widget should be presented.
 
   \param position The position whose details will be displayed.
@@ -2766,7 +2842,7 @@ static NSString * _Nonnull const TradableUtilitiesErrorDomain = @"TradableAPI.Tr
 */
 - (void)tradablePresentPositionDetailFor:(TradableAccount * _Nonnull)account with:(TradablePosition * _Nonnull)position delegate:(id <TradablePositionDetailDelegate> _Nullable)delegate presentationStyle:(UIModalPresentationStyle)presentationStyle;
 /**
-  Presents Broker Sign In widget.
+  Presents a Broker Sign In widget.
   \param appId The id of the app in which the widget is used.
 
   \param delegate An optional TradableBrokerSignInDelegate that will be called when the widget is dismissed.

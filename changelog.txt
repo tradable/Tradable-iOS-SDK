@@ -1,3 +1,10 @@
+v1.32
+
+- Improved the updates mechanics.
+- Added a setStatusChangeDelegate(_:) method to TradableOrder to listen for order status changes through a TradableOrderStatusDelegate.
+- Added an Account Details widget and a UINavigationController extension tradablePresentAccountDetails(for:showDisconnectButton:) to present it.
+
+
 v1.31
 
 - Improved and fixed the widgets.
