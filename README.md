@@ -18,9 +18,9 @@ Drag <i>TradableAPI.framework</i> to <b>Embedded Binaries</b> section in <b>Gene
 ### CocoaPods
 
 While itself not available through CocoaPods, Tradable iOS SDK depends on the following pods:
-- [Alamofire](https://github.com/Alamofire/Alamofire) version ~> 4.2
-- [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON) version ~> 3.1
-- [SwiftKeychainWrapper](https://github.com/jrendel/SwiftKeychainWrapper) version ~> 3.0
+- [Alamofire](https://github.com/Alamofire/Alamofire) version 4.5.0
+- [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON) version 3.1.4
+- [SwiftKeychainWrapper](https://github.com/jrendel/SwiftKeychainWrapper) version 3.0.1
 
 In order to be able to use this framework, please include these pods in your Podfile. More information about CocoaPods can be found [here](https://cocoapods.org).
 

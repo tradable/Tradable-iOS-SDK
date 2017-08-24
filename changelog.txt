@@ -1,3 +1,10 @@
+v1.33
+
+- Compiled the SDK with Swift 3.2 compiler (using Xcode 8.3).
+- Added classes and methods related to subscriptions.
+- Added two-factor authentication and relogin handling logic.
+
+
 v1.32
 
 - Improved the updates mechanics.
