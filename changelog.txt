@@ -1,6 +1,12 @@
+v1.34
+
+- Compiled the SDK with Swift 4.0 compiler (using Xcode 9.0).
+- Added a showLogin param to authenticate(withAppId:uri:viewController:) and tradablePresentAuthenticationWebsite(forAppId:withUri:) methods.
+
+
 v1.33
 
-- Compiled the SDK with Swift 3.2 compiler (using Xcode 8.3).
+- ~~Compiled the SDK with Swift 3.2 compiler (using Xcode 8.3).~~
 - Added classes and methods related to subscriptions.
 - Added two-factor authentication and relogin handling logic.
 
