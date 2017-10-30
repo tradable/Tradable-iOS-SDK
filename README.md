@@ -8,8 +8,8 @@ Read documentation at http://tradable.github.io/ios/docs/.
 ## Requirements
 
 - iOS 9.0+
-- Xcode 8.0+
-- Swift 3.0+
+- Xcode 9.0+
+- Swift 3.2+
 
 ## Installation
 
@@ -18,7 +18,7 @@ Drag <i>TradableAPI.framework</i> to <b>Embedded Binaries</b> section in <b>Gene
 ### CocoaPods
 
 While itself not available through CocoaPods, Tradable iOS SDK depends on the following pods:
-- [Alamofire](https://github.com/Alamofire/Alamofire) version 4.5.0
+- [Alamofire](https://github.com/Alamofire/Alamofire) version 4.5.1
 - [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON) version 3.1.4
 - [SwiftKeychainWrapper](https://github.com/jrendel/SwiftKeychainWrapper) version 3.0.1
 
